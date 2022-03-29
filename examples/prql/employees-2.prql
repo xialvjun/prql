@@ -11,7 +11,7 @@ join dm:dept_manager [
   (dm.dept_no = de.dept_no) and s"(de.from_date, de.to_date) OVERLAPS (dm.from_date, dm.to_date)"
 ]
 aggregate by:[dm.emp_no, gender] [
-  salary_avg: average emp_salary,
+  salary_avg: averrage emp_salary,
   salary_sd: stddev emp_salary
 ]
 derive [
