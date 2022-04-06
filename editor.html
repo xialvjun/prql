@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Verbs - PRQL Language reference</title>
+        <title>Live Editor - PRQL Language reference</title>
         <!-- Custom HTML head -->
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="Modern language for transforming data — a simpler and more powerful SQL">
@@ -75,7 +75,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="verbs.html" class="active"><strong aria-hidden="true">2.</strong> Verbs</a></li><li class="chapter-item expanded "><a href="syntax.html"><strong aria-hidden="true">3.</strong> Syntax</a></li><li class="chapter-item expanded "><a href="functions.html"><strong aria-hidden="true">4.</strong> Functions</a></li><li class="chapter-item expanded "><a href="stdlib.html"><strong aria-hidden="true">5.</strong> Stdlib</a></li><li class="chapter-item expanded "><a href="editor.html"><strong aria-hidden="true">6.</strong> Live Editor</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="verbs.html"><strong aria-hidden="true">2.</strong> Verbs</a></li><li class="chapter-item expanded "><a href="syntax.html"><strong aria-hidden="true">3.</strong> Syntax</a></li><li class="chapter-item expanded "><a href="functions.html"><strong aria-hidden="true">4.</strong> Functions</a></li><li class="chapter-item expanded "><a href="stdlib.html"><strong aria-hidden="true">5.</strong> Stdlib</a></li><li class="chapter-item expanded "><a href="editor.html" class="active"><strong aria-hidden="true">6.</strong> Live Editor</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -137,134 +137,27 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="verbs"><a class="header" href="#verbs">Verbs</a></h1>
-<p>Core principle of the language is a pipeline, which is a series of sequential transformations of a table (or data frame). There is only a few different types of transformations which are identified by their verbs.</p>
-<h2 id="from"><a class="header" href="#from">From</a></h2>
-<blockquote>
-<p>specifies a data source</p>
-</blockquote>
-<pre><code class="language-prql">from {table reference}
-</code></pre>
-<p><em>Example:</em></p>
-<pre><code class="language-prql">from employees
-</code></pre>
-<h2 id="select"><a class="header" href="#select">Select</a></h2>
-<blockquote>
-<p>picks columns based on their names</p>
-</blockquote>
-<pre><code class="language-prql">select [{expression}]
-</code></pre>
-<p><em>Example:</em></p>
-<pre><code class="language-prql">from employees
-select [first_name, last_name]
-</code></pre>
-<h2 id="derive"><a class="header" href="#derive">Derive</a></h2>
-<blockquote>
-<p>adds new columns that are computed from existing columns</p>
-</blockquote>
-<pre><code class="language-prql">derive [{new_name}: {expression}]
-</code></pre>
-<p><em>Example:</em></p>
-<pre><code class="language-prql">from employees
-derive gross_salary: salary + payroll_tax
-</code></pre>
-<pre><code class="language-prql">from employees
-derive [
-  gross_salary: salary + payroll_tax,
-  gross_cost: gross_salary + benefits_cost
-]
-</code></pre>
-<h2 id="filter"><a class="header" href="#filter">Filter</a></h2>
-<blockquote>
-<p>picks rows based on their values</p>
-</blockquote>
-<pre><code class="language-prql">filter {boolean expression}
-</code></pre>
-<p><em>Example:</em></p>
-<pre><code class="language-prql">from employees
-filter length last_name &lt; 3
-</code></pre>
-<h2 id="take"><a class="header" href="#take">Take</a></h2>
-<blockquote>
-<p>picks first n rows</p>
-</blockquote>
-<pre><code class="language-prql">take {n}
-</code></pre>
-<p><em>Example:</em></p>
-<pre><code class="language-prql">from employees
-take 10
-</code></pre>
-<h2 id="sort"><a class="header" href="#sort">Sort</a></h2>
-<blockquote>
-<p>orders the rows by the values of selected columns</p>
-</blockquote>
-<pre><code class="language-prql">sort {column}
-</code></pre>
-<p><em>Arguments:</em></p>
-<ul>
-<li>a column identifier of the key to sort by</li>
-</ul>
-<p><em>Example:</em></p>
-<pre><code class="language-prql">from employees
-sort age
-</code></pre>
-<h2 id="join"><a class="header" href="#join">Join</a></h2>
-<blockquote>
-<p>adds columns from another table, matching rows based on a condition</p>
-</blockquote>
-<pre><code class="language-prql">join side:{inner|left|right|full} {table} {[conditions]}
-</code></pre>
-<p><em>Arguments:</em></p>
-<ul>
-<li><code>side</code> decides which rows to include. Defaults to <code>inner</code></li>
-<li>table reference</li>
-<li>list of conditions
-<ul>
-<li>If all terms are column identifiers, this will compile to <code>USING(...)</code>. In this case, both of the tables must have specified column. The result will only contain one column instead one for each table.</li>
-</ul>
-</li>
-</ul>
-<p><em>Example:</em></p>
-<pre><code class="language-prql">from employees
-join side:left positions [id=employee_id]
-</code></pre>
-<pre><code class="language-sql">SELECT * FROM employees
-LEFT JOIN positions ON id = employee_id
-</code></pre>
-<p><em>Example:</em></p>
-<pre><code class="language-prql">from employees
-join side:full positions [emp_no]
-</code></pre>
-<pre><code class="language-sql">SELECT * FROM employees
-FULL OUTER JOIN positions ON USING(emp_no)
-</code></pre>
-<h2 id="aggregate"><a class="header" href="#aggregate">Aggregate</a></h2>
-<blockquote>
-<p>group rows by one or more columns</p>
-</blockquote>
-<pre><code class="language-prql">aggregate by:[{column identifier}] [{expression or assign operation}]
-</code></pre>
-<p><em>Example:</em></p>
-<pre><code class="language-prql">from employees
-aggregate by:[title, country] [
-  average salary,
-  ct: count
-]
-</code></pre>
-<pre><code class="language-sql">SELECT title, country, AVG(salary), COUNT(*) AS ct
-FROM employees
-GROUP BY title, country
-</code></pre>
+                        <h1 id="live-editor"><a class="header" href="#live-editor">Live Editor</a></h1>
+<!-- The `container-container` properties already exist on `editor-container`, but we
+need to re-specify them since there's another layer (maybe avoidable?). -->
+<style>
+    main {
+        /*Override the main CSS so that the Editors can be wide*/
+        max-width: none !important;
+    }
+    .container-container {
+        height: 100vh;
+        width: 100%;
+    }
+</style>
+<embed class="container-container" type="text/html" src="./dist/index.html">
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="introduction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="stdlib.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
-                            </a>
-                            <a rel="next" href="syntax.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
                             </a>
                         <div style="clear: both"></div>
                     </nav>
@@ -272,11 +165,8 @@ GROUP BY title, country
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="introduction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="stdlib.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
-                    </a>
-                    <a rel="next" href="syntax.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
 
