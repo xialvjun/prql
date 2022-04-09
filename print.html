@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>PRQL Language reference</title>
+        <title>PRQL Language Reference (draft)</title>
         <meta name="robots" content="noindex" />
         <!-- Custom HTML head -->
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
@@ -76,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="transforms.html"><strong aria-hidden="true">2.</strong> Transforms</a></li><li class="chapter-item expanded "><a href="syntax.html"><strong aria-hidden="true">3.</strong> Syntax</a></li><li class="chapter-item expanded "><a href="functions.html"><strong aria-hidden="true">4.</strong> Functions</a></li><li class="chapter-item expanded "><a href="stdlib.html"><strong aria-hidden="true">5.</strong> Stdlib</a></li><li class="chapter-item expanded "><a href="editor.html"><strong aria-hidden="true">6.</strong> Live Editor</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="queries/index.html"><strong aria-hidden="true">2.</strong> Queries</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="queries/pipelines.html"><strong aria-hidden="true">2.1.</strong> Pipelines</a></li></ol></li><li class="chapter-item expanded "><a href="verbs.html"><strong aria-hidden="true">3.</strong> Verbs</a></li><li class="chapter-item expanded "><a href="language-features/index.html"><strong aria-hidden="true">4.</strong> Language features</a></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">4.1.</strong> String concat</div></li><li class="chapter-item expanded "><div><strong aria-hidden="true">4.2.</strong> Ranges</div></li><li class="chapter-item expanded "><div><strong aria-hidden="true">4.3.</strong> Dates</div></li><li class="chapter-item expanded "><div><strong aria-hidden="true">4.4.</strong> Regex</div></li><li class="chapter-item expanded "><a href="s-strings.html"><strong aria-hidden="true">4.5.</strong> S-Strings</a></li></ol></li><li class="chapter-item expanded "><a href="transforms.html"><strong aria-hidden="true">5.</strong> Transforms</a></li><li class="chapter-item expanded "><a href="syntax.html"><strong aria-hidden="true">6.</strong> Syntax</a></li><li class="chapter-item expanded "><a href="functions.html"><strong aria-hidden="true">7.</strong> Functions</a></li><li class="chapter-item expanded "><a href="stdlib.html"><strong aria-hidden="true">8.</strong> Stdlib</a></li><li class="chapter-item expanded "><a href="editor.html"><strong aria-hidden="true">9.</strong> Live Editor</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -105,7 +105,7 @@
                         </button>
                     </div>
 
-                    <h1 class="menu-title">PRQL Language reference</h1>
+                    <h1 class="menu-title">PRQL Language Reference (draft)</h1>
 
                     <div class="right-buttons">
                         <a href="print.html" title="Print this book" aria-label="Print this book">
@@ -139,6 +139,10 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<blockquote>
+<p>[Note that this is a very early version and actively being worked on; thanks for
+your patience]</p>
+</blockquote>
 <p>PRQL is a modern language for transforming data — a simpler and more powerful
 SQL. Like SQL, it's readable, explicit and declarative. Unlike SQL, it forms a
 logical pipeline of transformations, and supports abstractions such as variables
@@ -167,7 +171,7 @@ take 20
 join countries side:left [country_code]
 derive [
   always_true: true,
-  s_string: s&quot;version()&quot;,                  # An S-string, which transpiles directly into SQL
+  db_version: s&quot;version()&quot;,                  # An S-string, which transpiles directly into SQL
 ]
 </code></pre>
 <p>As you can see, PRQL is a linear <strong>pipeline of transformations</strong> — each line of the
@@ -212,6 +216,96 @@ FROM
   table_1
 </code></pre>
 <p>You can see that in SQL, operations do not follow one another, which makes it hard to compose larger queries.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="queries"><a class="header" href="#queries">Queries</a></h1>
+<p>PRQL queries are structured differently to SQL queries — they represent a
+pipeline of transformations, each one changing the previous result into a new
+result.</p>
+<ul>
+<li><a href="queries/pipelines.html">Pipelines</a></li>
+</ul>
+<p>[TODO]</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="pipelines"><a class="header" href="#pipelines">Pipelines</a></h1>
+<h3 id="the-simplest-pipeline"><a class="header" href="#the-simplest-pipeline">The simplest pipeline</a></h3>
+<p>The simplest pipeline is just:</p>
+<pre><code class="language-prql">from employees
+</code></pre>
+<p>...which is equivalent to:</p>
+<pre><code class="language-sql">SELECT * FROM employees
+</code></pre>
+<h3 id="adding-transformations"><a class="header" href="#adding-transformations">Adding transformations</a></h3>
+<p>We can add additional lines, each one transforms the result:</p>
+<pre><code class="language-prql">from employees
+derive gross_salary: (salary + payroll_tax)
+</code></pre>
+<p>...which is equivalent to:</p>
+<pre><code class="language-sql">SELECT
+  *,
+  salary + payroll_tax AS gross_salary
+FROM employees
+</code></pre>
+<p>...and so on:</p>
+<pre><code class="language-prql">from employees
+derive gross_salary: (salary + payroll_tax)
+aggregate
+sort gross_salary
+</code></pre>
+<p>...which is equivalent to:</p>
+<pre><code class="language-sql">SELECT
+  *,
+  salary + payroll_tax AS gross_salary
+FROM employees
+ORDER BY gross_salary
+</code></pre>
+<pre><code class="language-elm">from employees
+filter country = &quot;USA&quot;                           # Each line transforms the previous result.
+derive [                                         # This adds columns / variables.
+  gross_salary: salary + payroll_tax,
+  gross_cost:   gross_salary + benefits_cost     # Variables can use other variables.
+]
+filter gross_cost &gt; 0
+aggregate by:[title, country] [                  # `by` are the columns to group by.
+    average salary,                              # These are aggregation calcs run on each group.
+    sum     salary,
+    average gross_salary,
+    sum     gross_salary,
+    average gross_cost,
+    sum_gross_cost: sum gross_cost,
+    ct: count,
+]
+sort sum_gross_cost
+filter ct &gt; 200
+take 20
+</code></pre>
+<pre><code class="language-sql">SELECT
+  title,
+  country,
+  AVG(salary),
+  SUM(salary),
+  AVG(salary + payroll_tax),
+  SUM(salary + payroll_tax),
+  AVG(salary + payroll_tax + benefits_cost),
+  SUM(salary + payroll_tax + benefits_cost) AS sum_gross_cost,
+  COUNT(*) AS ct
+FROM
+  employees
+WHERE
+  country = 'USA'
+  AND salary + payroll_tax + benefits_cost &gt; 0
+GROUP BY
+  title,
+  country
+HAVING
+  COUNT(*) &gt; 200
+ORDER BY
+  sum_gross_cost
+LIMIT
+  20
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="verbs"><a class="header" href="#verbs">Verbs</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="language-features"><a class="header" href="#language-features">Language Features</a></h1>
+<p>PRQL improves on many of SQL's awkward language features:</p>
+<!-- toc -->
+<div style="break-before: page; page-break-before: always;"></div><h1 id="s-strings"><a class="header" href="#s-strings">S-Strings</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="transforms"><a class="header" href="#transforms">Transforms</a></h1>
 <p>Core principle of the language is a pipeline, which is a series of sequential transformations of a table (or data frame). There is only a few different types of transformations:</p>
 <h2 id="from"><a class="header" href="#from">From</a></h2>
@@ -332,17 +426,6 @@ GROUP BY title, country
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="syntax"><a class="header" href="#syntax">Syntax</a></h1>
 <!-- Here we could explain how function parameters work, what is a list, S-strings, how to do aliases and so on. -->
-<h3 id="s-strings"><a class="header" href="#s-strings">S-Strings</a></h3>
-<p>An s-string inserts SQL directly. It's similar in form to a python f-string, but
-the result is SQL, rather than a string literal; i.e.:</p>
-<pre><code class="language-prql">func sum col = s&quot;SUM({col})&quot;
-sum salary
-</code></pre>
-<p>transpiles to:</p>
-<pre><code class="language-sql">SUM(salary)
-</code></pre>
-<p>...whereas if it were a python f-string, it would make <code>&quot;sum(salary)&quot;</code>, with the
-quotes.</p>
 <h3 id="lists"><a class="header" href="#lists">Lists</a></h3>
 <ul>
 <li>
@@ -356,7 +439,7 @@ quotes.</p>
 <p>More examples in <a href="examples/list-equivalence.html"><strong>list-equivalence.md</strong></a>.</p>
 </li>
 </ul>
-<h3 id="pipelines"><a class="header" href="#pipelines">Pipelines</a></h3>
+<h3 id="pipelines-1"><a class="header" href="#pipelines-1">Pipelines</a></h3>
 <ul>
 <li>
 <p>A line-break generally creates a pipelined transformation. For example:</p>
