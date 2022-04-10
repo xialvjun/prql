@@ -76,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="queries/index.html"><strong aria-hidden="true">2.</strong> Queries</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="queries/pipelines.html"><strong aria-hidden="true">2.1.</strong> Pipelines</a></li></ol></li><li class="chapter-item expanded "><a href="verbs.html"><strong aria-hidden="true">3.</strong> Verbs</a></li><li class="chapter-item expanded "><a href="language-features/index.html"><strong aria-hidden="true">4.</strong> Language features</a></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">4.1.</strong> String concat</div></li><li class="chapter-item expanded "><div><strong aria-hidden="true">4.2.</strong> Ranges</div></li><li class="chapter-item expanded "><div><strong aria-hidden="true">4.3.</strong> Dates</div></li><li class="chapter-item expanded "><div><strong aria-hidden="true">4.4.</strong> Regex</div></li><li class="chapter-item expanded "><a href="s-strings.html"><strong aria-hidden="true">4.5.</strong> S-Strings</a></li></ol></li><li class="chapter-item expanded "><a href="transforms.html"><strong aria-hidden="true">5.</strong> Transforms</a></li><li class="chapter-item expanded "><a href="syntax.html"><strong aria-hidden="true">6.</strong> Syntax</a></li><li class="chapter-item expanded "><a href="functions.html"><strong aria-hidden="true">7.</strong> Functions</a></li><li class="chapter-item expanded "><a href="stdlib.html"><strong aria-hidden="true">8.</strong> Stdlib</a></li><li class="chapter-item expanded "><a href="editor.html"><strong aria-hidden="true">9.</strong> Live Editor</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="queries/index.html"><strong aria-hidden="true">2.</strong> Queries</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="queries/pipelines.html"><strong aria-hidden="true">2.1.</strong> Pipelines</a></li></ol></li><li class="chapter-item expanded "><a href="verbs.html"><strong aria-hidden="true">3.</strong> Verbs</a></li><li class="chapter-item expanded "><a href="language-features/index.html"><strong aria-hidden="true">4.</strong> Language features</a></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">4.1.</strong> String concat</div></li><li class="chapter-item expanded "><div><strong aria-hidden="true">4.2.</strong> Ranges</div></li><li class="chapter-item expanded "><div><strong aria-hidden="true">4.3.</strong> Dates</div></li><li class="chapter-item expanded "><div><strong aria-hidden="true">4.4.</strong> Regex</div></li><li class="chapter-item expanded "><a href="language-features/s-strings.html"><strong aria-hidden="true">4.5.</strong> S-Strings</a></li></ol></li><li class="chapter-item expanded "><a href="transforms.html"><strong aria-hidden="true">5.</strong> Transforms</a></li><li class="chapter-item expanded "><a href="syntax.html"><strong aria-hidden="true">6.</strong> Syntax</a></li><li class="chapter-item expanded "><a href="functions.html"><strong aria-hidden="true">7.</strong> Functions</a></li><li class="chapter-item expanded "><a href="stdlib.html"><strong aria-hidden="true">8.</strong> Stdlib</a></li><li class="chapter-item expanded "><a href="editor.html"><strong aria-hidden="true">9.</strong> Live Editor</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -306,6 +306,35 @@ LIMIT
 <p>PRQL improves on many of SQL's awkward language features:</p>
 <!-- toc -->
 <div style="break-before: page; page-break-before: always;"></div><h1 id="s-strings"><a class="header" href="#s-strings">S-Strings</a></h1>
+<p>An s-string inserts SQL directly, as an escape hatch when there's something that PRQL
+doesn't yet implement. For example, there's no <code>version()</code> function in SQL that
+returns the Postgres version, so if we want to use that, we use an s-string:</p>
+<pre><code class="language-prql">from x
+select db_version: s&quot;version()&quot;
+</code></pre>
+<p>...produces...</p>
+<pre><code class="language-sql">SELECT
+  version() AS db_version
+FROM
+  x
+</code></pre>
+<p>We can embed columns in an f-string using braces. For example, PRQL's standard
+library defines the <code>average</code> function as:</p>
+<pre><code class="language-prql">func average column = s&quot;AVG({column})&quot;
+</code></pre>
+<p>So that:</p>
+<pre><code class="language-prql">from x
+aggregate average value
+</code></pre>
+<p>...produces...</p>
+<pre><code class="language-sql">SELECT
+  AVG(value)
+FROM
+  x
+</code></pre>
+<p>For those who have used python, it's similar in to a python f-string, but the
+result is SQL, rather than a string literal — a python f-string
+would produce <code>&quot;average(salary)&quot;</code>, with the quotes.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="transforms"><a class="header" href="#transforms">Transforms</a></h1>
 <p>Core principle of the language is a pipeline, which is a series of sequential transformations of a table (or data frame). There is only a few different types of transformations:</p>
 <h2 id="from"><a class="header" href="#from">From</a></h2>
