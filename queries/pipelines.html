@@ -25,6 +25,7 @@
         <link rel="stylesheet" href="../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../comparison-table.css">
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -140,80 +141,70 @@
                         <h1 id="pipelines"><a class="header" href="#pipelines">Pipelines</a></h1>
 <h3 id="the-simplest-pipeline"><a class="header" href="#the-simplest-pipeline">The simplest pipeline</a></h3>
 <p>The simplest pipeline is just:</p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from employees
 </code></pre>
-<p>...which is equivalent to:</p>
-<pre><code class="language-sql">SELECT * FROM employees
-</code></pre>
-<h3 id="adding-transformations"><a class="header" href="#adding-transformations">Adding transformations</a></h3>
-<p>We can add additional lines, each one transforms the result:</p>
-<pre><code class="language-prql">from employees
-derive gross_salary: (salary + payroll_tax)
-</code></pre>
-<p>...which is equivalent to:</p>
+</td>
+<td>
 <pre><code class="language-sql">SELECT
-  *,
-  salary + payroll_tax AS gross_salary
-FROM employees
-</code></pre>
-<p>...and so on:</p>
-<pre><code class="language-prql">from employees
-derive gross_salary: (salary + payroll_tax)
-aggregate
-sort gross_salary
-</code></pre>
-<p>...which is equivalent to:</p>
-<pre><code class="language-sql">SELECT
-  *,
-  salary + payroll_tax AS gross_salary
-FROM employees
-ORDER BY gross_salary
-</code></pre>
-<pre><code class="language-elm">from employees
-filter country = &quot;USA&quot;                           # Each line transforms the previous result.
-derive [                                         # This adds columns / variables.
-  gross_salary: salary + payroll_tax,
-  gross_cost:   gross_salary + benefits_cost     # Variables can use other variables.
-]
-filter gross_cost &gt; 0
-aggregate by:[title, country] [                  # `by` are the columns to group by.
-    average salary,                              # These are aggregation calcs run on each group.
-    sum     salary,
-    average gross_salary,
-    sum     gross_salary,
-    average gross_cost,
-    sum_gross_cost: sum gross_cost,
-    ct: count,
-]
-sort sum_gross_cost
-filter ct &gt; 200
-take 20
-</code></pre>
-<pre><code class="language-sql">SELECT
-  title,
-  country,
-  AVG(salary),
-  SUM(salary),
-  AVG(salary + payroll_tax),
-  SUM(salary + payroll_tax),
-  AVG(salary + payroll_tax + benefits_cost),
-  SUM(salary + payroll_tax + benefits_cost) AS sum_gross_cost,
-  COUNT(*) AS ct
+  employees.*
 FROM
   employees
-WHERE
-  country = 'USA'
-  AND salary + payroll_tax + benefits_cost &gt; 0
-GROUP BY
-  title,
-  country
-HAVING
-  COUNT(*) &gt; 200
-ORDER BY
-  sum_gross_cost
-LIMIT
-  20
 </code></pre>
+</td>
+</tr>
+</table>
+<h3 id="adding-transformations"><a class="header" href="#adding-transformations">Adding transformations</a></h3>
+<p>We can add additional lines, each one transforms the result:</p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
+<pre><code class="language-prql">from employees
+derive gross_salary: (salary + payroll_tax)
+</code></pre>
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  employees.*,
+  salary + payroll_tax AS gross_salary
+FROM
+  employees
+</code></pre>
+</td>
+</tr>
+</table>
+<p>...and so on:</p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
+<pre><code class="language-prql">from employees
+derive gross_salary: (salary + payroll_tax)
+sort gross_salary
+</code></pre>
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  employees.*,
+  salary + payroll_tax AS gross_salary
+FROM
+  employees
+ORDER BY
+  gross_salary
+</code></pre>
+</td>
+</tr>
+</table>
 
                     </main>
 

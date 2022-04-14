@@ -26,6 +26,7 @@
         <link rel="stylesheet" href="ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="comparison-table.css">
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -149,6 +150,13 @@ logical pipeline of transformations, and supports abstractions such as variables
 and functions. It can be used with any database that uses SQL, since it
 transpiles to SQL.</p>
 <p>Let's get started with an example:</p>
+<!-- TODO: resolve formatting — way too wide for the current preprocessor -->
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from employees
 filter country_code = &quot;USA&quot;                # Each line transforms the previous result.
 derive [                                   # This adds columns / variables.
@@ -174,47 +182,49 @@ derive [
   db_version: s&quot;version()&quot;,                  # An S-string, which transpiles directly into SQL
 ]
 </code></pre>
-<p>As you can see, PRQL is a linear <strong>pipeline of transformations</strong> — each line of the
-query is a transformation of the previous line's result.</p>
-<p>This query can be compiled into SQL:</p>
+</td>
+<td>
 <pre><code class="language-sql">WITH table_0 AS (
   SELECT
-    TOP (20) title,
+    title,
     country_code,
-    SUM(salary + payroll_tax + benefits_cost) AS sum_gross_cost,
-    COUNT(*) AS ct,
     AVG(salary),
     SUM(salary),
     AVG(salary + payroll_tax),
     SUM(salary + payroll_tax),
-    AVG(salary + payroll_tax + benefits_cost)
+    AVG(salary + payroll_tax + benefits_cost),
+    SUM(salary + payroll_tax + benefits_cost) AS sum_gross_cost,
+    COUNT(*) AS ct
   FROM
     employees
   WHERE
     country_code = 'USA'
-    and salary + payroll_tax + benefits_cost &gt; 0
+    AND salary + payroll_tax + benefits_cost &gt; 0
   GROUP BY
     title,
     country_code
   HAVING
-    ct &gt; 200
+    COUNT(*) &gt; 200
   ORDER BY
     sum_gross_cost
-),
-table_1 AS (
-  SELECT
-    *,
-    true AS always_true,
-    version() AS s_string
-  FROM
-    table_0
-    LEFT JOIN countries USING(country_code)
+  LIMIT
+    20
 )
 SELECT
-  *
+  table_0.*,
+  countries.*,
+  country_code,
+  true AS always_true,
+  version() AS db_version
 FROM
-  table_1
+  table_0
+  LEFT JOIN countries USING(country_code)
 </code></pre>
+</td>
+</tr>
+</table>
+<p>As you can see, PRQL is a linear <strong>pipeline of transformations</strong> — each line of the
+query is a transformation of the previous line's result.</p>
 <p>You can see that in SQL, operations do not follow one another, which makes it hard to compose larger queries.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="queries"><a class="header" href="#queries">Queries</a></h1>
 <p>PRQL queries are structured differently to SQL queries — they represent a
@@ -227,100 +237,107 @@ result.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="pipelines"><a class="header" href="#pipelines">Pipelines</a></h1>
 <h3 id="the-simplest-pipeline"><a class="header" href="#the-simplest-pipeline">The simplest pipeline</a></h3>
 <p>The simplest pipeline is just:</p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from employees
 </code></pre>
-<p>...which is equivalent to:</p>
-<pre><code class="language-sql">SELECT * FROM employees
-</code></pre>
-<h3 id="adding-transformations"><a class="header" href="#adding-transformations">Adding transformations</a></h3>
-<p>We can add additional lines, each one transforms the result:</p>
-<pre><code class="language-prql">from employees
-derive gross_salary: (salary + payroll_tax)
-</code></pre>
-<p>...which is equivalent to:</p>
+</td>
+<td>
 <pre><code class="language-sql">SELECT
-  *,
-  salary + payroll_tax AS gross_salary
-FROM employees
-</code></pre>
-<p>...and so on:</p>
-<pre><code class="language-prql">from employees
-derive gross_salary: (salary + payroll_tax)
-aggregate
-sort gross_salary
-</code></pre>
-<p>...which is equivalent to:</p>
-<pre><code class="language-sql">SELECT
-  *,
-  salary + payroll_tax AS gross_salary
-FROM employees
-ORDER BY gross_salary
-</code></pre>
-<pre><code class="language-elm">from employees
-filter country = &quot;USA&quot;                           # Each line transforms the previous result.
-derive [                                         # This adds columns / variables.
-  gross_salary: salary + payroll_tax,
-  gross_cost:   gross_salary + benefits_cost     # Variables can use other variables.
-]
-filter gross_cost &gt; 0
-aggregate by:[title, country] [                  # `by` are the columns to group by.
-    average salary,                              # These are aggregation calcs run on each group.
-    sum     salary,
-    average gross_salary,
-    sum     gross_salary,
-    average gross_cost,
-    sum_gross_cost: sum gross_cost,
-    ct: count,
-]
-sort sum_gross_cost
-filter ct &gt; 200
-take 20
-</code></pre>
-<pre><code class="language-sql">SELECT
-  title,
-  country,
-  AVG(salary),
-  SUM(salary),
-  AVG(salary + payroll_tax),
-  SUM(salary + payroll_tax),
-  AVG(salary + payroll_tax + benefits_cost),
-  SUM(salary + payroll_tax + benefits_cost) AS sum_gross_cost,
-  COUNT(*) AS ct
+  employees.*
 FROM
   employees
-WHERE
-  country = 'USA'
-  AND salary + payroll_tax + benefits_cost &gt; 0
-GROUP BY
-  title,
-  country
-HAVING
-  COUNT(*) &gt; 200
-ORDER BY
-  sum_gross_cost
-LIMIT
-  20
 </code></pre>
+</td>
+</tr>
+</table>
+<h3 id="adding-transformations"><a class="header" href="#adding-transformations">Adding transformations</a></h3>
+<p>We can add additional lines, each one transforms the result:</p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
+<pre><code class="language-prql">from employees
+derive gross_salary: (salary + payroll_tax)
+</code></pre>
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  employees.*,
+  salary + payroll_tax AS gross_salary
+FROM
+  employees
+</code></pre>
+</td>
+</tr>
+</table>
+<p>...and so on:</p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
+<pre><code class="language-prql">from employees
+derive gross_salary: (salary + payroll_tax)
+sort gross_salary
+</code></pre>
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  employees.*,
+  salary + payroll_tax AS gross_salary
+FROM
+  employees
+ORDER BY
+  gross_salary
+</code></pre>
+</td>
+</tr>
+</table>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="language-features"><a class="header" href="#language-features">Language Features</a></h1>
 <p>PRQL improves on many of SQL's awkward language features:</p>
 <!-- toc -->
 <div style="break-before: page; page-break-before: always;"></div><h1 id="f-strings"><a class="header" href="#f-strings">F-Strings</a></h1>
 <p>f-strings are a readable approach to building new strings from existing strings.
 Currently PRQL supports this for concatenating strings:</p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from x
 select full_name: f&quot;{first} {last}&quot;
 </code></pre>
-<p>...produces...</p>
+</td>
+<td>
 <pre><code class="language-sql">SELECT
   CONCAT(first, ' ', last) AS full_name
 FROM
   x
 </code></pre>
+</td>
+</tr>
+</table>
 <p>This can be much easier to read for longer strings, relative to the SQL approach:</p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from x
 select url: f&quot;http{tls}://www.{domain}.{tld}/{page}&quot;
 </code></pre>
-<p>...produces...</p>
+</td>
+<td>
 <pre><code class="language-sql">SELECT
   CONCAT(
     'http',
@@ -335,6 +352,9 @@ select url: f&quot;http{tls}://www.{domain}.{tld}/{page}&quot;
 FROM
   x
 </code></pre>
+</td>
+</tr>
+</table>
 <p>In the future, this may extend to other types of formatting, such as datetimes,
 numbers, and padding. If there's a feature that would be helpful, please <a href="https://github.com/prql/prql/issues/new/choose">post
 an issue</a>.</p>
@@ -342,29 +362,46 @@ an issue</a>.</p>
 <p>An s-string inserts SQL directly, as an escape hatch when there's something that PRQL
 doesn't yet implement. For example, there's no <code>version()</code> function in SQL that
 returns the Postgres version, so if we want to use that, we use an s-string:</p>
-<pre><code class="language-prql">from x
-select db_version: s&quot;version()&quot;
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
+<pre><code class="language-prql">derive db_version: s&quot;version()&quot;
 </code></pre>
-<p>...produces...</p>
+</td>
+<td>
 <pre><code class="language-sql">SELECT
   version() AS db_version
-FROM
-  x
 </code></pre>
-<p>We can embed columns in an f-string using braces. For example, PRQL's standard
+</td>
+</tr>
+</table>
+<p>We can embed columns in an s-string using braces. For example, PRQL's standard
 library defines the <code>average</code> function as:</p>
-<pre><code class="language-prql">func average column = s&quot;AVG({column})&quot;
+<pre><code class="language-prql_no_test">func average column = s&quot;AVG({column})&quot;
 </code></pre>
-<p>So that:</p>
-<pre><code class="language-prql">from x
-aggregate average value
+<p>So this compiles using the function:</p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
+<pre><code class="language-prql">from employees
+aggregate [average salary]
 </code></pre>
-<p>...produces...</p>
+</td>
+<td>
 <pre><code class="language-sql">SELECT
-  AVG(value)
+  AVG(salary)
 FROM
-  x
+  employees
 </code></pre>
+</td>
+</tr>
+</table>
 <p>For those who have used python, it's similar in to a python f-string, but the
 result is SQL, rather than a string literal — a python f-string
 would produce <code>&quot;average(salary)&quot;</code>, with the quotes.</p>
@@ -374,76 +411,180 @@ would produce <code>&quot;average(salary)&quot;</code>, with the quotes.</p>
 <blockquote>
 <p>specifies a data source</p>
 </blockquote>
-<pre><code class="language-prql">from {table reference}
+<pre><code class="language-prql_no_test">from {table reference}
 </code></pre>
 <p><em>Example:</em></p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from employees
 </code></pre>
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  employees.*
+FROM
+  employees
+</code></pre>
+</td>
+</tr>
+</table>
 <h2 id="select"><a class="header" href="#select">Select</a></h2>
 <blockquote>
 <p>picks columns based on their names</p>
 </blockquote>
-<pre><code class="language-prql">select [{expression}]
+<pre><code class="language-prql_no_test">select [{expression}]
 </code></pre>
 <p><em>Example:</em></p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from employees
 select [first_name, last_name]
 </code></pre>
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  first_name,
+  last_name
+FROM
+  employees
+</code></pre>
+</td>
+</tr>
+</table>
 <h2 id="derive"><a class="header" href="#derive">Derive</a></h2>
 <blockquote>
 <p>adds new columns that are computed from existing columns</p>
 </blockquote>
-<pre><code class="language-prql">derive [{new_name}: {expression}]
+<pre><code class="language-prql_no_test">derive [{new_name}: {expression}]
 </code></pre>
 <p><em>Example:</em></p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from employees
 derive gross_salary: salary + payroll_tax
 </code></pre>
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  employees.*,
+  salary + payroll_tax AS gross_salary
+FROM
+  employees
+</code></pre>
+</td>
+</tr>
+</table>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from employees
 derive [
   gross_salary: salary + payroll_tax,
   gross_cost: gross_salary + benefits_cost
 ]
 </code></pre>
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  employees.*,
+  salary + payroll_tax AS gross_salary,
+  salary + payroll_tax + benefits_cost AS gross_cost
+FROM
+  employees
+</code></pre>
+</td>
+</tr>
+</table>
 <h2 id="filter"><a class="header" href="#filter">Filter</a></h2>
 <blockquote>
 <p>picks rows based on their values</p>
 </blockquote>
-<pre><code class="language-prql">filter {boolean expression}
+<pre><code class="language-prql_no_test">filter {boolean expression}
 </code></pre>
 <p><em>Example:</em></p>
-<pre><code class="language-prql">from employees
-filter length last_name &lt; 3
+<pre><code class="language-prql_no_test">from employees
+filter (length last_name &lt; 3)
 </code></pre>
 <h2 id="take"><a class="header" href="#take">Take</a></h2>
 <blockquote>
 <p>picks first n rows</p>
 </blockquote>
-<pre><code class="language-prql">take {n}
+<pre><code class="language-prql_no_test">take {n}
 </code></pre>
 <p><em>Example:</em></p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from employees
 take 10
 </code></pre>
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  employees.*
+FROM
+  employees
+LIMIT
+  10
+</code></pre>
+</td>
+</tr>
+</table>
 <h2 id="sort"><a class="header" href="#sort">Sort</a></h2>
 <blockquote>
 <p>orders the rows by the values of selected columns</p>
 </blockquote>
-<pre><code class="language-prql">sort {column}
+<pre><code class="language-prql_no_test">sort {column}
 </code></pre>
 <p><em>Arguments:</em></p>
 <ul>
 <li>a column identifier of the key to sort by</li>
 </ul>
 <p><em>Example:</em></p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from employees
 sort age
 </code></pre>
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  employees.*
+FROM
+  employees
+ORDER BY
+  employees.age
+</code></pre>
+</td>
+</tr>
+</table>
 <h2 id="join"><a class="header" href="#join">Join</a></h2>
 <blockquote>
 <p>adds columns from another table, matching rows based on a condition</p>
 </blockquote>
-<pre><code class="language-prql">join side:{inner|left|right|full} {table} {[conditions]}
+<pre><code class="language-prql_no_test">join side:{inner|left|right|full} {table} {[conditions]}
 </code></pre>
 <p><em>Arguments:</em></p>
 <ul>
@@ -456,36 +597,85 @@ sort age
 </li>
 </ul>
 <p><em>Example:</em></p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from employees
 join side:left positions [id=employee_id]
 </code></pre>
-<pre><code class="language-sql">SELECT * FROM employees
-LEFT JOIN positions ON id = employee_id
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  employees.*,
+  positions.*
+FROM
+  employees
+  LEFT JOIN positions ON id = employee_id
 </code></pre>
+</td>
+</tr>
+</table>
 <p><em>Example:</em></p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from employees
 join side:full positions [emp_no]
 </code></pre>
-<pre><code class="language-sql">SELECT * FROM employees
-FULL OUTER JOIN positions ON USING(emp_no)
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  employees.*,
+  positions.*,
+  emp_no
+FROM
+  employees FULL
+  JOIN positions USING(emp_no)
 </code></pre>
+</td>
+</tr>
+</table>
 <h2 id="aggregate"><a class="header" href="#aggregate">Aggregate</a></h2>
 <blockquote>
 <p>group rows by one or more columns</p>
 </blockquote>
-<pre><code class="language-prql">aggregate by:[{column identifier}] [{expression or assign operation}]
+<pre><code class="language-prql_no_test">aggregate by:[{column identifier}] [{expression or assign operation}]
 </code></pre>
 <p><em>Example:</em></p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from employees
 aggregate by:[title, country] [
   average salary,
   ct: count
 ]
 </code></pre>
-<pre><code class="language-sql">SELECT title, country, AVG(salary), COUNT(*) AS ct
-FROM employees
-GROUP BY title, country
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  title,
+  country,
+  AVG(salary),
+  COUNT(*) AS ct
+FROM
+  employees
+GROUP BY
+  title,
+  country
 </code></pre>
+</td>
+</tr>
+</table>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="syntax"><a class="header" href="#syntax">Syntax</a></h1>
 <!-- Here we could explain how function parameters work, what is a list, S-strings, how to do aliases and so on. -->
 <h3 id="lists"><a class="header" href="#lists">Lists</a></h3>
@@ -505,16 +695,51 @@ GROUP BY title, country
 <ul>
 <li>
 <p>A line-break generally creates a pipelined transformation. For example:</p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from tbl
-select [
+</code></pre>
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  tbl.*
+FROM
+  tbl
+</code></pre>
+</td>
+</tr>
+</table>
   col1,
   col2,
-]
+\]
 filter col1 = col2
-</code></pre>
+````
 <p>...is equivalent to:</p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from tbl | select [col1, col2] | filter col1 = col2
 </code></pre>
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  col1,
+  col2
+FROM
+  tbl
+WHERE
+  col1 = col2
+</code></pre>
+</td>
+</tr>
+</table>
 </li>
 <li>
 <p>A line-break doesn't created a pipeline in a few cases:</p>

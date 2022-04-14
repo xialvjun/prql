@@ -25,6 +25,7 @@
         <link rel="stylesheet" href="ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="comparison-table.css">
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -148,6 +149,13 @@ logical pipeline of transformations, and supports abstractions such as variables
 and functions. It can be used with any database that uses SQL, since it
 transpiles to SQL.</p>
 <p>Let's get started with an example:</p>
+<!-- TODO: resolve formatting — way too wide for the current preprocessor -->
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from employees
 filter country_code = &quot;USA&quot;                # Each line transforms the previous result.
 derive [                                   # This adds columns / variables.
@@ -173,47 +181,49 @@ derive [
   db_version: s&quot;version()&quot;,                  # An S-string, which transpiles directly into SQL
 ]
 </code></pre>
-<p>As you can see, PRQL is a linear <strong>pipeline of transformations</strong> — each line of the
-query is a transformation of the previous line's result.</p>
-<p>This query can be compiled into SQL:</p>
+</td>
+<td>
 <pre><code class="language-sql">WITH table_0 AS (
   SELECT
-    TOP (20) title,
+    title,
     country_code,
-    SUM(salary + payroll_tax + benefits_cost) AS sum_gross_cost,
-    COUNT(*) AS ct,
     AVG(salary),
     SUM(salary),
     AVG(salary + payroll_tax),
     SUM(salary + payroll_tax),
-    AVG(salary + payroll_tax + benefits_cost)
+    AVG(salary + payroll_tax + benefits_cost),
+    SUM(salary + payroll_tax + benefits_cost) AS sum_gross_cost,
+    COUNT(*) AS ct
   FROM
     employees
   WHERE
     country_code = 'USA'
-    and salary + payroll_tax + benefits_cost &gt; 0
+    AND salary + payroll_tax + benefits_cost &gt; 0
   GROUP BY
     title,
     country_code
   HAVING
-    ct &gt; 200
+    COUNT(*) &gt; 200
   ORDER BY
     sum_gross_cost
-),
-table_1 AS (
-  SELECT
-    *,
-    true AS always_true,
-    version() AS s_string
-  FROM
-    table_0
-    LEFT JOIN countries USING(country_code)
+  LIMIT
+    20
 )
 SELECT
-  *
+  table_0.*,
+  countries.*,
+  country_code,
+  true AS always_true,
+  version() AS db_version
 FROM
-  table_1
+  table_0
+  LEFT JOIN countries USING(country_code)
 </code></pre>
+</td>
+</tr>
+</table>
+<p>As you can see, PRQL is a linear <strong>pipeline of transformations</strong> — each line of the
+query is a transformation of the previous line's result.</p>
 <p>You can see that in SQL, operations do not follow one another, which makes it hard to compose larger queries.</p>
 
                     </main>

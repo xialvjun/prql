@@ -25,6 +25,7 @@
         <link rel="stylesheet" href="ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="comparison-table.css">
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -143,76 +144,180 @@
 <blockquote>
 <p>specifies a data source</p>
 </blockquote>
-<pre><code class="language-prql">from {table reference}
+<pre><code class="language-prql_no_test">from {table reference}
 </code></pre>
 <p><em>Example:</em></p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from employees
 </code></pre>
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  employees.*
+FROM
+  employees
+</code></pre>
+</td>
+</tr>
+</table>
 <h2 id="select"><a class="header" href="#select">Select</a></h2>
 <blockquote>
 <p>picks columns based on their names</p>
 </blockquote>
-<pre><code class="language-prql">select [{expression}]
+<pre><code class="language-prql_no_test">select [{expression}]
 </code></pre>
 <p><em>Example:</em></p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from employees
 select [first_name, last_name]
 </code></pre>
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  first_name,
+  last_name
+FROM
+  employees
+</code></pre>
+</td>
+</tr>
+</table>
 <h2 id="derive"><a class="header" href="#derive">Derive</a></h2>
 <blockquote>
 <p>adds new columns that are computed from existing columns</p>
 </blockquote>
-<pre><code class="language-prql">derive [{new_name}: {expression}]
+<pre><code class="language-prql_no_test">derive [{new_name}: {expression}]
 </code></pre>
 <p><em>Example:</em></p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from employees
 derive gross_salary: salary + payroll_tax
 </code></pre>
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  employees.*,
+  salary + payroll_tax AS gross_salary
+FROM
+  employees
+</code></pre>
+</td>
+</tr>
+</table>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from employees
 derive [
   gross_salary: salary + payroll_tax,
   gross_cost: gross_salary + benefits_cost
 ]
 </code></pre>
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  employees.*,
+  salary + payroll_tax AS gross_salary,
+  salary + payroll_tax + benefits_cost AS gross_cost
+FROM
+  employees
+</code></pre>
+</td>
+</tr>
+</table>
 <h2 id="filter"><a class="header" href="#filter">Filter</a></h2>
 <blockquote>
 <p>picks rows based on their values</p>
 </blockquote>
-<pre><code class="language-prql">filter {boolean expression}
+<pre><code class="language-prql_no_test">filter {boolean expression}
 </code></pre>
 <p><em>Example:</em></p>
-<pre><code class="language-prql">from employees
-filter length last_name &lt; 3
+<pre><code class="language-prql_no_test">from employees
+filter (length last_name &lt; 3)
 </code></pre>
 <h2 id="take"><a class="header" href="#take">Take</a></h2>
 <blockquote>
 <p>picks first n rows</p>
 </blockquote>
-<pre><code class="language-prql">take {n}
+<pre><code class="language-prql_no_test">take {n}
 </code></pre>
 <p><em>Example:</em></p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from employees
 take 10
 </code></pre>
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  employees.*
+FROM
+  employees
+LIMIT
+  10
+</code></pre>
+</td>
+</tr>
+</table>
 <h2 id="sort"><a class="header" href="#sort">Sort</a></h2>
 <blockquote>
 <p>orders the rows by the values of selected columns</p>
 </blockquote>
-<pre><code class="language-prql">sort {column}
+<pre><code class="language-prql_no_test">sort {column}
 </code></pre>
 <p><em>Arguments:</em></p>
 <ul>
 <li>a column identifier of the key to sort by</li>
 </ul>
 <p><em>Example:</em></p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from employees
 sort age
 </code></pre>
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  employees.*
+FROM
+  employees
+ORDER BY
+  employees.age
+</code></pre>
+</td>
+</tr>
+</table>
 <h2 id="join"><a class="header" href="#join">Join</a></h2>
 <blockquote>
 <p>adds columns from another table, matching rows based on a condition</p>
 </blockquote>
-<pre><code class="language-prql">join side:{inner|left|right|full} {table} {[conditions]}
+<pre><code class="language-prql_no_test">join side:{inner|left|right|full} {table} {[conditions]}
 </code></pre>
 <p><em>Arguments:</em></p>
 <ul>
@@ -225,36 +330,85 @@ sort age
 </li>
 </ul>
 <p><em>Example:</em></p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from employees
 join side:left positions [id=employee_id]
 </code></pre>
-<pre><code class="language-sql">SELECT * FROM employees
-LEFT JOIN positions ON id = employee_id
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  employees.*,
+  positions.*
+FROM
+  employees
+  LEFT JOIN positions ON id = employee_id
 </code></pre>
+</td>
+</tr>
+</table>
 <p><em>Example:</em></p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from employees
 join side:full positions [emp_no]
 </code></pre>
-<pre><code class="language-sql">SELECT * FROM employees
-FULL OUTER JOIN positions ON USING(emp_no)
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  employees.*,
+  positions.*,
+  emp_no
+FROM
+  employees FULL
+  JOIN positions USING(emp_no)
 </code></pre>
+</td>
+</tr>
+</table>
 <h2 id="aggregate"><a class="header" href="#aggregate">Aggregate</a></h2>
 <blockquote>
 <p>group rows by one or more columns</p>
 </blockquote>
-<pre><code class="language-prql">aggregate by:[{column identifier}] [{expression or assign operation}]
+<pre><code class="language-prql_no_test">aggregate by:[{column identifier}] [{expression or assign operation}]
 </code></pre>
 <p><em>Example:</em></p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
 <pre><code class="language-prql">from employees
 aggregate by:[title, country] [
   average salary,
   ct: count
 ]
 </code></pre>
-<pre><code class="language-sql">SELECT title, country, AVG(salary), COUNT(*) AS ct
-FROM employees
-GROUP BY title, country
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  title,
+  country,
+  AVG(salary),
+  COUNT(*) AS ct
+FROM
+  employees
+GROUP BY
+  title,
+  country
 </code></pre>
+</td>
+</tr>
+</table>
 
                     </main>
 
