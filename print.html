@@ -77,7 +77,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="queries/index.html"><strong aria-hidden="true">2.</strong> Queries</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="queries/pipelines.html"><strong aria-hidden="true">2.1.</strong> Pipelines</a></li></ol></li><li class="chapter-item expanded "><a href="language-features/index.html"><strong aria-hidden="true">3.</strong> Language features</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="language-features/f-strings.html"><strong aria-hidden="true">3.1.</strong> F-Strings</a></li><li class="chapter-item expanded "><a href="language-features/ranges.html"><strong aria-hidden="true">3.2.</strong> Ranges</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">3.3.</strong> Dates</div></li><li class="chapter-item expanded "><div><strong aria-hidden="true">3.4.</strong> Regex</div></li><li class="chapter-item expanded "><a href="language-features/s-strings.html"><strong aria-hidden="true">3.5.</strong> S-Strings</a></li></ol></li><li class="chapter-item expanded "><a href="transforms.html"><strong aria-hidden="true">4.</strong> Transforms</a></li><li class="chapter-item expanded "><a href="syntax.html"><strong aria-hidden="true">5.</strong> Syntax</a></li><li class="chapter-item expanded "><a href="functions.html"><strong aria-hidden="true">6.</strong> Functions</a></li><li class="chapter-item expanded "><a href="stdlib.html"><strong aria-hidden="true">7.</strong> Stdlib</a></li><li class="chapter-item expanded "><a href="editor.html"><strong aria-hidden="true">8.</strong> Live Editor</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="queries/index.html"><strong aria-hidden="true">2.</strong> Queries</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="queries/pipelines.html"><strong aria-hidden="true">2.1.</strong> Pipelines</a></li></ol></li><li class="chapter-item expanded "><a href="language-features/index.html"><strong aria-hidden="true">3.</strong> Language features</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="language-features/f-strings.html"><strong aria-hidden="true">3.1.</strong> F-Strings</a></li><li class="chapter-item expanded "><a href="language-features/ranges.html"><strong aria-hidden="true">3.2.</strong> Ranges</a></li><li class="chapter-item expanded "><a href="language-features/dates.html"><strong aria-hidden="true">3.3.</strong> Dates</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">3.4.</strong> Regex</div></li><li class="chapter-item expanded "><a href="language-features/s-strings.html"><strong aria-hidden="true">3.5.</strong> S-Strings</a></li></ol></li><li class="chapter-item expanded "><a href="transforms.html"><strong aria-hidden="true">4.</strong> Transforms</a></li><li class="chapter-item expanded "><a href="syntax.html"><strong aria-hidden="true">5.</strong> Syntax</a></li><li class="chapter-item expanded "><a href="functions.html"><strong aria-hidden="true">6.</strong> Functions</a></li><li class="chapter-item expanded "><a href="stdlib.html"><strong aria-hidden="true">7.</strong> Stdlib</a></li><li class="chapter-item expanded "><a href="editor.html"><strong aria-hidden="true">8.</strong> Live Editor</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -383,6 +383,29 @@ WHERE
 </tr>
 </table>
 <p>Like in SQL, ranges are inclusive.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="dates"><a class="header" href="#dates">Dates</a></h1>
+<h3 id="intervals"><a class="header" href="#intervals">Intervals</a></h3>
+<p>It's possible to represent intervals with a single expression:</p>
+<table class="comparison">
+<tr>
+<th>PRQL</th><th>SQL</th>
+</tr>
+<tr>
+<td>
+<pre><code class="language-prql">from projects
+derive first_check_in: start + 10days
+</code></pre>
+</td>
+<td>
+<pre><code class="language-sql">SELECT
+  projects.*,
+  start + INTERVAL '10' DAY AS first_check_in
+FROM
+  projects
+</code></pre>
+</td>
+</tr>
+</table>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="s-strings"><a class="header" href="#s-strings">S-Strings</a></h1>
 <p>An s-string inserts SQL directly, as an escape hatch when there's something that PRQL
 doesn't yet implement. For example, there's no <code>version()</code> function in SQL that
