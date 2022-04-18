@@ -450,9 +450,12 @@ FROM
 </td>
 </tr>
 </table>
-<p>For those who have used python, it's similar in to a python f-string, but the
-result is SQL, rather than a string literal — a python f-string
-would produce <code>&quot;average(salary)&quot;</code>, with the quotes.</p>
+<p>For those who have used python, s-strings are similar to python f-strings, but
+the result is SQL, rather than a string literal — a python f-string would
+produce <code>&quot;average(salary)&quot;</code>, with the quotes.</p>
+<p>S-strings in user code are intended as an escape-hatch for an unimplemented
+feature. If we often need s-strings to express something, that's a sign we
+should implement it in PRQL / PRQL's stdlib.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="transforms"><a class="header" href="#transforms">Transforms</a></h1>
 <p>Core principle of the language is a pipeline, which is a series of sequential transformations of a table (or data frame). There is only a few different types of transformations:</p>
 <h2 id="from"><a class="header" href="#from">From</a></h2>
