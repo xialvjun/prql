@@ -139,8 +139,16 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="dates"><a class="header" href="#dates">Dates</a></h1>
-<h3 id="intervals"><a class="header" href="#intervals">Intervals</a></h3>
-<p>It's possible to represent intervals with a single expression:</p>
+<h2 id="intervals"><a class="header" href="#intervals">Intervals</a></h2>
+<p>Intervals are represented by <code>{N}{periods}</code>, such as <code>2years</code> or <code>10minutes</code>,
+without a space.</p>
+<blockquote>
+<p>These aren't the same as ISO8601, because we evaluated <code>P3Y6M4DT12H30M5S</code> to
+be difficult to understand, but we could support a simplified form if there's
+demand for it. We don't currently support compound expressions, for example
+<code>2years10months</code>, but most DBs will allow <code>2years + 10months</code>. Please raise an
+issue if this is inconvenient.</p>
+</blockquote>
 <table class="comparison">
 <tr>
 <th>PRQL</th><th>SQL</th>
