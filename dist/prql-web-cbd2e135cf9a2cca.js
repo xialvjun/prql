@@ -314,7 +314,7 @@ async function load(module, imports) {
 
 async function init(input) {
     if (typeof input === 'undefined') {
-        input = new URL('index-cbd2e135cf9a2cca_bg.wasm', import.meta.url);
+        input = new URL('prql-web-cbd2e135cf9a2cca_bg.wasm', import.meta.url);
     }
     const imports = {};
     imports.wbg = {};
