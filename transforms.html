@@ -190,14 +190,14 @@ FROM
 <blockquote>
 <p>adds new columns that are computed from existing columns</p>
 </blockquote>
-<pre><code class="language-prql_no_test">derive [{new_name}: {expression}]
+<pre><code class="language-prql_no_test">derive [{new_name} = {expression}]
 </code></pre>
 <p><em>Example:</em></p>
 <div class="comparison">
 <div>
 <h4 id="prql-2"><a class="header" href="#prql-2">PRQL</a></h4>
 <pre><code class="language-prql">from employees
-derive gross_salary: salary + payroll_tax
+derive gross_salary = salary + payroll_tax
 </code></pre>
 </div>
 <div>
@@ -215,8 +215,8 @@ FROM
 <h4 id="prql-3"><a class="header" href="#prql-3">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 derive [
-  gross_salary: salary + payroll_tax,
-  gross_cost: gross_salary + benefits_cost
+  gross_salary = salary + payroll_tax,
+  gross_cost = gross_salary + benefits_cost
 ]
 </code></pre>
 </div>
@@ -316,7 +316,7 @@ ORDER BY
 <div>
 <h4 id="prql-6"><a class="header" href="#prql-6">PRQL</a></h4>
 <pre><code class="language-prql">from employees
-join side:left positions [id=employee_id]
+join side:left positions [id==employee_id]
 </code></pre>
 </div>
 <div>
@@ -361,7 +361,7 @@ columns passed to <code>group</code>'s first argument.</p>
 group [title, country] (
   aggregate [
     average salary,
-    ct: count
+    ct = count
   ]
 )
 </code></pre>
@@ -428,7 +428,7 @@ group role (
 <pre><code class="language-prql">from employees
 aggregate [
   average salary,
-  ct: count
+  ct = count
 ]
 </code></pre>
 </div>

@@ -165,7 +165,7 @@ select [
   col1,
   col2,
 ]
-filter col1 = col2
+filter col1 == col2
 </code></pre>
 </div>
 <div>
@@ -184,7 +184,7 @@ WHERE
 <div class="comparison">
 <div>
 <h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
-<pre><code class="language-prql">from tbl | select [col1, col2] | filter col1 = col2
+<pre><code class="language-prql">from tbl | select [col1, col2] | filter col1 == col2
 </code></pre>
 </div>
 <div>

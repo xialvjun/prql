@@ -155,10 +155,10 @@ transpiles to SQL.</p>
 <div>
 <h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">from employees
-filter country_code = &quot;USA&quot;    # Each line transforms the previous result.
+filter country_code == &quot;USA&quot;   # Each line transforms the previous result.
 derive [                       # This adds columns / variables.
-  gross_salary: salary + payroll_tax,
-  gross_cost: gross_salary + benefits_cost  # Variables can use other variables.
+  gross_salary = salary + payroll_tax,
+  gross_cost = gross_salary + benefits_cost  # Variables can use other variables.
 ]
 filter gross_cost &gt; 0
 group [title, country_code] (  # For each group use a nested pipeline
@@ -168,8 +168,8 @@ group [title, country_code] (  # For each group use a nested pipeline
     sum salary,
     sum gross_salary,
     average gross_cost,
-    sum_gross_cost: sum gross_cost,
-    ct: count,
+    sum_gross_cost = sum gross_cost,
+    ct = count,
   ]
 )
 sort sum_gross_cost
@@ -177,8 +177,8 @@ filter ct &gt; 200
 take 20
 join countries side:left [country_code]
 derive [
-  always_true: true,
-  db_version: s&quot;version()&quot;,    # An S-string, which transpiles directly into SQL
+  always_true = true,
+  db_version = s&quot;version()&quot;,    # An S-string, which transpiles directly into SQL
 ]
 </code></pre>
 </div>
@@ -257,7 +257,7 @@ FROM
 <div>
 <h4 id="prql-2"><a class="header" href="#prql-2">PRQL</a></h4>
 <pre><code class="language-prql">from employees
-derive gross_salary: (salary + payroll_tax)
+derive gross_salary = (salary + payroll_tax)
 </code></pre>
 </div>
 <div>
@@ -275,7 +275,7 @@ FROM
 <div>
 <h4 id="prql-3"><a class="header" href="#prql-3">PRQL</a></h4>
 <pre><code class="language-prql">from employees
-derive gross_salary: (salary + payroll_tax)
+derive gross_salary = (salary + payroll_tax)
 sort gross_salary
 </code></pre>
 </div>
@@ -299,7 +299,7 @@ ORDER BY
 <div class="comparison">
 <div>
 <h4 id="prql-4"><a class="header" href="#prql-4">PRQL</a></h4>
-<pre><code class="language-prql">derive x: &quot;hello world&quot;
+<pre><code class="language-prql">derive x = &quot;hello world&quot;
 </code></pre>
 </div>
 <div>
@@ -312,7 +312,7 @@ ORDER BY
 <div class="comparison">
 <div>
 <h4 id="prql-5"><a class="header" href="#prql-5">PRQL</a></h4>
-<pre><code class="language-prql">derive x: 'hello world'
+<pre><code class="language-prql">derive x = 'hello world'
 </code></pre>
 </div>
 <div>
@@ -327,7 +327,7 @@ use three-or-more quotes, and close with the same number.</p>
 <div class="comparison">
 <div>
 <h4 id="prql-6"><a class="header" href="#prql-6">PRQL</a></h4>
-<pre><code class="language-prql">derive x: '&quot;hello world&quot;'
+<pre><code class="language-prql">derive x = '&quot;hello world&quot;'
 </code></pre>
 </div>
 <div>
@@ -340,7 +340,7 @@ use three-or-more quotes, and close with the same number.</p>
 <div class="comparison">
 <div>
 <h4 id="prql-7"><a class="header" href="#prql-7">PRQL</a></h4>
-<pre><code class="language-prql">derive x: &quot;&quot;&quot;I said &quot;hello world&quot;!&quot;&quot;&quot;
+<pre><code class="language-prql">derive x = &quot;&quot;&quot;I said &quot;hello world&quot;!&quot;&quot;&quot;
 </code></pre>
 </div>
 <div>
@@ -361,7 +361,7 @@ Currently PRQL supports this for concatenating strings:</p>
 <div>
 <h4 id="prql-8"><a class="header" href="#prql-8">PRQL</a></h4>
 <pre><code class="language-prql">from x
-select full_name: f&quot;{first} {last}&quot;
+select full_name = f&quot;{first} {last}&quot;
 </code></pre>
 </div>
 <div>
@@ -378,7 +378,7 @@ FROM
 <div>
 <h4 id="prql-9"><a class="header" href="#prql-9">PRQL</a></h4>
 <pre><code class="language-prql">from x
-select url: f&quot;http{tls}://www.{domain}.{tld}/{page}&quot;
+select url = f&quot;http{tls}://www.{domain}.{tld}/{page}&quot;
 </code></pre>
 </div>
 <div>
@@ -409,7 +409,7 @@ returns the Postgres version, so if we want to use that, we use an s-string:</p>
 <div class="comparison">
 <div>
 <h4 id="prql-10"><a class="header" href="#prql-10">PRQL</a></h4>
-<pre><code class="language-prql">derive db_version: s&quot;version()&quot;
+<pre><code class="language-prql">derive db_version = s&quot;version()&quot;
 </code></pre>
 </div>
 <div>
@@ -421,7 +421,7 @@ returns the Postgres version, so if we want to use that, we use an s-string:</p>
 </div>
 <p>We can embed columns in an s-string using braces. For example, PRQL's standard
 library defines the <code>average</code> function as:</p>
-<pre><code class="language-prql_no_test">func average column = s&quot;AVG({column})&quot;
+<pre><code class="language-prql_no_test">func average column -&gt; s&quot;AVG({column})&quot;
 </code></pre>
 <p>So this compiles using the function:</p>
 <div class="comparison">
@@ -483,7 +483,7 @@ issue if this is inconvenient.</p>
 <div>
 <h4 id="prql-13"><a class="header" href="#prql-13">PRQL</a></h4>
 <pre><code class="language-prql">from projects
-derive first_check_in: start + 10days
+derive first_check_in = start + 10days
 </code></pre>
 </div>
 <div>
@@ -548,14 +548,14 @@ FROM
 <blockquote>
 <p>adds new columns that are computed from existing columns</p>
 </blockquote>
-<pre><code class="language-prql_no_test">derive [{new_name}: {expression}]
+<pre><code class="language-prql_no_test">derive [{new_name} = {expression}]
 </code></pre>
 <p><em>Example:</em></p>
 <div class="comparison">
 <div>
 <h4 id="prql-16"><a class="header" href="#prql-16">PRQL</a></h4>
 <pre><code class="language-prql">from employees
-derive gross_salary: salary + payroll_tax
+derive gross_salary = salary + payroll_tax
 </code></pre>
 </div>
 <div>
@@ -573,8 +573,8 @@ FROM
 <h4 id="prql-17"><a class="header" href="#prql-17">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 derive [
-  gross_salary: salary + payroll_tax,
-  gross_cost: gross_salary + benefits_cost
+  gross_salary = salary + payroll_tax,
+  gross_cost = gross_salary + benefits_cost
 ]
 </code></pre>
 </div>
@@ -674,7 +674,7 @@ ORDER BY
 <div>
 <h4 id="prql-20"><a class="header" href="#prql-20">PRQL</a></h4>
 <pre><code class="language-prql">from employees
-join side:left positions [id=employee_id]
+join side:left positions [id==employee_id]
 </code></pre>
 </div>
 <div>
@@ -719,7 +719,7 @@ columns passed to <code>group</code>'s first argument.</p>
 group [title, country] (
   aggregate [
     average salary,
-    ct: count
+    ct = count
   ]
 )
 </code></pre>
@@ -786,7 +786,7 @@ group role (
 <pre><code class="language-prql">from employees
 aggregate [
   average salary,
-  ct: count
+  ct = count
 ]
 </code></pre>
 </div>
@@ -827,7 +827,7 @@ select [
   col1,
   col2,
 ]
-filter col1 = col2
+filter col1 == col2
 </code></pre>
 </div>
 <div>
@@ -846,7 +846,7 @@ WHERE
 <div class="comparison">
 <div>
 <h4 id="prql-26"><a class="header" href="#prql-26">PRQL</a></h4>
-<pre><code class="language-prql">from tbl | select [col1, col2] | filter col1 = col2
+<pre><code class="language-prql">from tbl | select [col1, col2] | filter col1 == col2
 </code></pre>
 </div>
 <div>
@@ -894,10 +894,10 @@ default value.</li>
 <div class="comparison">
 <div>
 <h4 id="prql-27"><a class="header" href="#prql-27">PRQL</a></h4>
-<pre><code class="language-prql">func celsius_of_fahrenheit temp = (temp - 32) * 3
+<pre><code class="language-prql">func celsius_of_fahrenheit temp -&gt;  (temp - 32) * 3
 
 from cities
-derive temp_c: (celsius_of_fahrenheit temp_f)
+derive temp_c = (celsius_of_fahrenheit temp_f)
 </code></pre>
 </div>
 <div>
@@ -917,12 +917,12 @@ between <code>lower</code> and <code>higher</code>.</p>
 <div class="comparison">
 <div>
 <h4 id="prql-28"><a class="header" href="#prql-28">PRQL</a></h4>
-<pre><code class="language-prql">func interp lower:0 higher x = (x - lower) / (higher - lower)
+<pre><code class="language-prql">func interp lower:0 higher x -&gt;  (x - lower) / (higher - lower)
 
 from students
 derive [
-  sat_proportion_1: (interp 1600 sat_score),
-  sat_proportion_2: (interp lower:0 1600 sat_score),
+  sat_proportion_1 = (interp 1600 sat_score),
+  sat_proportion_2 = (interp lower:0 1600 sat_score),
 ]
 </code></pre>
 </div>
@@ -946,12 +946,12 @@ alternative construction:</p>
 <div class="comparison">
 <div>
 <h4 id="prql-29"><a class="header" href="#prql-29">PRQL</a></h4>
-<pre><code class="language-prql">func interp lower:0 higher x = (x - lower) / (higher - lower)
+<pre><code class="language-prql">func interp lower:0 higher x -&gt;  (x - lower) / (higher - lower)
 
 from students
 derive [
-  sat_proportion_1: (sat_score | interp 1600),
-  sat_proportion_2: (sat_score | interp lower:0 1600),
+  sat_proportion_1= (sat_score | interp 1600),
+  sat_proportion_2= (sat_score | interp lower:0 1600),
 ]
 </code></pre>
 </div>
@@ -970,10 +970,10 @@ FROM
 <div class="comparison">
 <div>
 <h4 id="prql-30"><a class="header" href="#prql-30">PRQL</a></h4>
-<pre><code class="language-prql">func celsius_of_fahrenheit temp = (temp - 32) * 3
+<pre><code class="language-prql">func celsius_of_fahrenheit temp -&gt;  (temp - 32) * 3
 
 from cities
-derive temp_c: (temp_f | celsius_of_fahrenheit)
+derive temp_c = (temp_f | celsius_of_fahrenheit)
 </code></pre>
 </div>
 <div>
@@ -990,11 +990,11 @@ FROM
 <div class="comparison">
 <div>
 <h4 id="prql-31"><a class="header" href="#prql-31">PRQL</a></h4>
-<pre><code class="language-prql">func celsius_of_fahrenheit temp = (temp - 32) * 3
-func interp lower:0 higher x = (x - lower) / (higher - lower)
+<pre><code class="language-prql">func celsius_of_fahrenheit temp -&gt;  (temp - 32) * 3
+func interp lower:0 higher x -&gt;  (x - lower) / (higher - lower)
 
 from kettles
-derive boiling_proportion: (temp_c | celsius_of_fahrenheit | interp 100)
+derive boiling_proportion = (temp_c | celsius_of_fahrenheit | interp 100)
 </code></pre>
 </div>
 <div>
@@ -1008,12 +1008,13 @@ FROM
 </div>
 </div>
 <h2 id="todos"><a class="header" href="#todos">TODOs</a></h2>
+<h3 id="late-binding"><a class="header" href="#late-binding">Late binding</a></h3>
 <p>Currently, functions require a binding to variables in scope; they can't
 late-bind to column names; so for example:</p>
-<pre><code class="language-prql_no_test">func return price = (price - dividend) / price_yesterday
+<pre><code class="language-prql_no_test">func return price -&gt;  (price - dividend) / price_yesterday
 </code></pre>
 <p>...isn't yet a valid function, and instead would needs to be:</p>
-<pre><code class="language-prql_no_test">func return price dividend price_yesterday = (price - dividend) / (price_yesterday)
+<pre><code class="language-prql_no_test">func return price dividend price_yesterday -&gt;  (price - dividend) / (price_yesterday)
 </code></pre>
 <p>(which makes functions in this case not useful)</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="stdlib"><a class="header" href="#stdlib">Stdlib</a></h1>
@@ -1070,10 +1071,10 @@ $ psql -U postgres -d employees -f pgsql-sample-data/employee/employees.dump
 <div>
 <h4 id="prql-32"><a class="header" href="#prql-32">PRQL</a></h4>
 <pre><code class="language-prql">from employees
-filter country = &quot;USA&quot;                       # Each line transforms the previous result.
+filter country == &quot;USA&quot;                       # Each line transforms the previous result.
 derive [                                     # This adds columns / variables.
-  gross_salary: salary + payroll_tax,
-  gross_cost:  gross_salary + benefits_cost  # Variables can use other variables.
+  gross_salary = salary + payroll_tax,
+  gross_cost = gross_salary + benefits_cost  # Variables can use other variables.
 ]
 filter gross_cost &gt; 0
 group [title, country] (                     # For each group use a nested pipeline
@@ -1083,8 +1084,8 @@ group [title, country] (                     # For each group use a nested pipel
     sum salary,
     sum gross_salary,
     average gross_cost,
-    sum_gross_cost: sum gross_cost,
-    ct: count,
+    sum_gross_cost = sum gross_cost,
+    ct = count,
   ]
 )
 sort sum_gross_cost
@@ -1121,29 +1122,56 @@ LIMIT
 </code></pre>
 </div>
 </div>
-<div style="break-before: page; page-break-before: always;"></div><h2 id="single-item-is-coerced-into-a-list"><a class="header" href="#single-item-is-coerced-into-a-list">Single item is coerced into a list</a></h2>
 <div class="comparison">
 <div>
 <h4 id="prql-33"><a class="header" href="#prql-33">PRQL</a></h4>
 <pre><code class="language-prql">from employees
-select salary
+group [emp_no] (
+  aggregate [
+    emp_salary = average salary     # average salary resolves to &quot;AVG(salary)&quot; (from stdlib)
+  ]
+)
+join titles [emp_no]
+group [title] (
+  aggregate [
+    avg_salary = average emp_salary
+  ]
+)
+select salary_k = avg_salary / 1000 # avg_salary should resolve to &quot;AVG(emp_salary)&quot;
+take 10                             # induces new SELECT
+derive salary = salary_k * 1000     # salary_k should not resolve to &quot;avg_salary / 1000&quot;
 </code></pre>
 </div>
 <div>
 <h4 id="sql-33"><a class="header" href="#sql-33">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  salary
+<pre><code class="language-sql">WITH table_0 AS (
+  SELECT
+    emp_no,
+    AVG(salary) AS emp_salary
+  FROM
+    employees
+  GROUP BY
+    emp_no
+)
+SELECT
+  AVG(table_0.emp_salary) / 1000 AS salary_k,
+  AVG(table_0.emp_salary) / 1000 * 1000 AS salary
 FROM
-  employees
+  table_0
+  JOIN titles USING(emp_no)
+GROUP BY
+  titles.title
+LIMIT
+  10
 </code></pre>
 </div>
 </div>
-<p>Same as above but with <code>salary</code> in a list:</p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="single-item-is-coerced-into-a-list"><a class="header" href="#single-item-is-coerced-into-a-list">Single item is coerced into a list</a></h2>
 <div class="comparison">
 <div>
 <h4 id="prql-34"><a class="header" href="#prql-34">PRQL</a></h4>
 <pre><code class="language-prql">from employees
-select [salary]
+select salary
 </code></pre>
 </div>
 <div>
@@ -1155,35 +1183,32 @@ FROM
 </code></pre>
 </div>
 </div>
-<h2 id="multiple-items"><a class="header" href="#multiple-items">Multiple items</a></h2>
+<p>Same as above but with <code>salary</code> in a list:</p>
 <div class="comparison">
 <div>
 <h4 id="prql-35"><a class="header" href="#prql-35">PRQL</a></h4>
 <pre><code class="language-prql">from employees
-derive [
-  gross_salary: salary + payroll_tax,
-  gross_cost:   gross_salary + benefits_cost
-]
+select [salary]
 </code></pre>
 </div>
 <div>
 <h4 id="sql-35"><a class="header" href="#sql-35">SQL</a></h4>
 <pre><code class="language-sql">SELECT
-  employees.*,
-  salary + payroll_tax AS gross_salary,
-  salary + payroll_tax + benefits_cost AS gross_cost
+  salary
 FROM
   employees
 </code></pre>
 </div>
 </div>
-<p>Same as above but split into two lines:</p>
+<h2 id="multiple-items"><a class="header" href="#multiple-items">Multiple items</a></h2>
 <div class="comparison">
 <div>
 <h4 id="prql-36"><a class="header" href="#prql-36">PRQL</a></h4>
 <pre><code class="language-prql">from employees
-derive gross_salary: salary + payroll_tax
-derive gross_cost: gross_salary + benefits_cost
+derive [
+  gross_salary = salary + payroll_tax,
+  gross_cost = gross_salary + benefits_cost
+]
 </code></pre>
 </div>
 <div>
@@ -1197,26 +1222,46 @@ FROM
 </code></pre>
 </div>
 </div>
+<p>Same as above but split into two lines:</p>
+<div class="comparison">
+<div>
+<h4 id="prql-37"><a class="header" href="#prql-37">PRQL</a></h4>
+<pre><code class="language-prql">from employees
+derive gross_salary = salary + payroll_tax
+derive gross_cost = gross_salary + benefits_cost
+</code></pre>
+</div>
+<div>
+<h4 id="sql-37"><a class="header" href="#sql-37">SQL</a></h4>
+<pre><code class="language-sql">SELECT
+  employees.*,
+  salary + payroll_tax AS gross_salary,
+  salary + payroll_tax + benefits_cost AS gross_cost
+FROM
+  employees
+</code></pre>
+</div>
+</div>
 <div style="break-before: page; page-break-before: always;"></div><p>This mostly works, apart from window clauses, and the version &amp; db args on the
 first line.</p>
 <pre><code class="language-prql_no_test">prql version:0.1 db:snowflake                         # Version number &amp; database name.
 
-func lag_day x = (
+func lag_day x -&gt;  (
   window x
   by sec_id
   sort date
   lag 1
 )
-func ret x = x / (x | lag_day) - 1 + dividend_return
-func excess x = (x - interest_rate) / 252
-func if_valid x = is_valid_price ? x : null
+func ret x -&gt;  x / (x | lag_day) - 1 + dividend_return
+func excess x -&gt;  (x - interest_rate) / 252
+func if_valid x -&gt;  is_valid_price ? x : null
 
 from prices
 derive [
-  return_total:      prices_adj   | ret | if_valid  # `|` can be used rather than newlines.
-  return_usd:        prices_usd   | ret | if_valid
-  return_excess:     return_total | excess
-  return_usd_excess: return_usd   | excess
+  return_total =      prices_adj   | ret | if_valid  # `|` can be used rather than newlines.
+  return_usd =        prices_usd   | ret | if_valid
+  return_excess =     return_total | excess
+  return_usd_excess = return_usd   | excess
 ]
 select [
   date,
@@ -1233,7 +1278,7 @@ select [
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><div class="comparison">
 <div>
-<h4 id="prql-37"><a class="header" href="#prql-37">PRQL</a></h4>
+<h4 id="prql-38"><a class="header" href="#prql-38">PRQL</a></h4>
 <pre><code class="language-prql">table newest_employees = (
   from employees
   sort tenure
@@ -1243,7 +1288,7 @@ select [
 table average_salaries = (
   from salaries
   group country (
-    aggregate average_country_salary: (average salary)
+    aggregate average_country_salary = (average salary)
   )
 )
 
@@ -1253,7 +1298,7 @@ select [name, salary, average_country_salary]
 </code></pre>
 </div>
 <div>
-<h4 id="sql-37"><a class="header" href="#sql-37">SQL</a></h4>
+<h4 id="sql-38"><a class="header" href="#sql-38">SQL</a></h4>
 <pre><code class="language-sql">WITH newest_employees AS (
   SELECT
     employees.*
@@ -1284,13 +1329,13 @@ FROM
 </div>
 <div style="break-before: page; page-break-before: always;"></div><div class="comparison">
 <div>
-<h4 id="prql-38"><a class="header" href="#prql-38">PRQL</a></h4>
+<h4 id="prql-39"><a class="header" href="#prql-39">PRQL</a></h4>
 <pre><code class="language-prql">from mytable
-filter id = $1
+filter id == $1
 </code></pre>
 </div>
 <div>
-<h4 id="sql-38"><a class="header" href="#sql-38">SQL</a></h4>
+<h4 id="sql-39"><a class="header" href="#sql-39">SQL</a></h4>
 <pre><code class="language-sql">SELECT
   mytable.*
 FROM
@@ -1313,22 +1358,22 @@ WHERE
 </ul>
 <div class="comparison">
 <div>
-<h4 id="prql-39"><a class="header" href="#prql-39">PRQL</a></h4>
+<h4 id="prql-40"><a class="header" href="#prql-40">PRQL</a></h4>
 <pre><code class="language-prql">from salaries
 group [emp_no] (
-  aggregate [emp_salary: average salary]
+  aggregate [emp_salary = average salary]
 )
-join t:titles [emp_no]
+join t=titles [emp_no]
 join dept_emp side:left [emp_no]
 group [dept_emp.dept_no, t.title] (
-  aggregate [avg_salary: average emp_salary]
+  aggregate [avg_salary = average emp_salary]
 )
 join departments [dept_no]
 select [dept_name, title, avg_salary]
 </code></pre>
 </div>
 <div>
-<h4 id="sql-39"><a class="header" href="#sql-39">SQL</a></h4>
+<h4 id="sql-40"><a class="header" href="#sql-40">SQL</a></h4>
 <pre><code class="language-sql">WITH table_0 AS (
   SELECT
     emp_no,
@@ -1368,19 +1413,19 @@ FROM
 </blockquote>
 <div class="comparison">
 <div>
-<h4 id="prql-40"><a class="header" href="#prql-40">PRQL</a></h4>
+<h4 id="prql-41"><a class="header" href="#prql-41">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 join salaries [emp_no]
 group [emp_no, gender] (
   aggregate [
-    emp_salary: average salary
+    emp_salary = average salary
   ]
 )
-join de:dept_emp [emp_no] side:left
+join de=dept_emp [emp_no] side:left
 group [de.dept_no, gender] (
   aggregate [
-    salary_avg: average emp_salary,
-    salary_sd: stddev emp_salary,
+    salary_avg = average emp_salary,
+    salary_sd = stddev emp_salary,
   ]
 )
 join departments [dept_no]
@@ -1388,7 +1433,7 @@ select [dept_name, gender, salary_avg, salary_sd]
 </code></pre>
 </div>
 <div>
-<h4 id="sql-40"><a class="header" href="#sql-40">SQL</a></h4>
+<h4 id="sql-41"><a class="header" href="#sql-41">SQL</a></h4>
 <pre><code class="language-sql">WITH table_0 AS (
   SELECT
     emp_no,
@@ -1432,34 +1477,32 @@ Prepare an analysis based on salaries and gender distribution by managers.</p>
 </blockquote>
 <div class="comparison">
 <div>
-<h4 id="prql-41"><a class="header" href="#prql-41">PRQL</a></h4>
+<h4 id="prql-42"><a class="header" href="#prql-42">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 join salaries [emp_no]
 group [emp_no, gender] (
   aggregate [
-    emp_salary: average salary
+    emp_salary = average salary
   ]
 )
-join de:dept_emp [emp_no]
-join dm:dept_manager [
-  (dm.dept_no = de.dept_no) and s&quot;(de.from_date, de.to_date) OVERLAPS (dm.from_date, dm.to_date)&quot;
+join de=dept_emp [emp_no]
+join dm=dept_manager [
+  (dm.dept_no == de.dept_no) and s&quot;(de.from_date, de.to_date) OVERLAPS (dm.from_date, dm.to_date)&quot;
 ]
 group [dm.emp_no, gender] (
   aggregate [
-    salary_avg: average emp_salary,
-    salary_sd: stddev emp_salary
+    salary_avg = average emp_salary,
+    salary_sd = stddev emp_salary
   ]
 )
-derive [
-  mng_no: dm.emp_no
-]
-join managers:employees [emp_no]
-derive [mng_name: s&quot;managers.first_name || ' ' || managers.last_name&quot;]
+derive mng_no = dm.emp_no
+join managers=employees [emp_no]
+derive mng_name = s&quot;managers.first_name || ' ' || managers.last_name&quot;
 select [mng_name, managers.gender, salary_avg, salary_sd]
 </code></pre>
 </div>
 <div>
-<h4 id="sql-41"><a class="header" href="#sql-41">SQL</a></h4>
+<h4 id="sql-42"><a class="header" href="#sql-42">SQL</a></h4>
 <pre><code class="language-sql">WITH table_0 AS (
   SELECT
     emp_no,
@@ -1505,14 +1548,14 @@ FROM
 </blockquote>
 <div class="comparison">
 <div>
-<h4 id="prql-42"><a class="header" href="#prql-42">PRQL</a></h4>
-<pre><code class="language-prql">from de:dept_emp
-join s:salaries side:left [
-  (s.emp_no = de.emp_no),
+<h4 id="prql-43"><a class="header" href="#prql-43">PRQL</a></h4>
+<pre><code class="language-prql">from de=dept_emp
+join s=salaries side:left [
+  (s.emp_no == de.emp_no),
   s&quot;({s.from_date}, {s.to_date}) OVERLAPS ({de.from_date}, {de.to_date})&quot;
 ]
 group [de.emp_no, de.dept_no] (
-  aggregate salary: (average s.salary)
+  aggregate salary = (average s.salary)
 )
 join employees [emp_no]
 join titles [emp_no]
@@ -1520,7 +1563,7 @@ select [dept_no, salary, employees.gender, titles.title]
 </code></pre>
 </div>
 <div>
-<h4 id="sql-42"><a class="header" href="#sql-42">SQL</a></h4>
+<h4 id="sql-43"><a class="header" href="#sql-43">SQL</a></h4>
 <pre><code class="language-sql">WITH table_0 AS (
   SELECT
     de.emp_no,

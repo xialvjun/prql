@@ -145,7 +145,7 @@ returns the Postgres version, so if we want to use that, we use an s-string:</p>
 <div class="comparison">
 <div>
 <h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
-<pre><code class="language-prql">derive db_version: s&quot;version()&quot;
+<pre><code class="language-prql">derive db_version = s&quot;version()&quot;
 </code></pre>
 </div>
 <div>
@@ -157,7 +157,7 @@ returns the Postgres version, so if we want to use that, we use an s-string:</p>
 </div>
 <p>We can embed columns in an s-string using braces. For example, PRQL's standard
 library defines the <code>average</code> function as:</p>
-<pre><code class="language-prql_no_test">func average column = s&quot;AVG({column})&quot;
+<pre><code class="language-prql_no_test">func average column -&gt; s&quot;AVG({column})&quot;
 </code></pre>
 <p>So this compiles using the function:</p>
 <div class="comparison">

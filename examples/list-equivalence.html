@@ -178,8 +178,8 @@ FROM
 <h4 id="prql-2"><a class="header" href="#prql-2">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 derive [
-  gross_salary: salary + payroll_tax,
-  gross_cost:   gross_salary + benefits_cost
+  gross_salary = salary + payroll_tax,
+  gross_cost = gross_salary + benefits_cost
 ]
 </code></pre>
 </div>
@@ -199,8 +199,8 @@ FROM
 <div>
 <h4 id="prql-3"><a class="header" href="#prql-3">PRQL</a></h4>
 <pre><code class="language-prql">from employees
-derive gross_salary: salary + payroll_tax
-derive gross_cost: gross_salary + benefits_cost
+derive gross_salary = salary + payroll_tax
+derive gross_cost = gross_salary + benefits_cost
 </code></pre>
 </div>
 <div>
