@@ -138,70 +138,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <p>Task:</p>
-<blockquote>
-<p>The company active pursues gender equality.</p>
-<p>Prepare an analysis based on salaries and gender distribution by departments.</p>
-</blockquote>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
-<pre><code class="language-prql">from employees
-join salaries [emp_no]
-group [emp_no, gender] (
-  aggregate [
-    emp_salary = average salary
-  ]
-)
-join de=dept_emp [emp_no] side:left
-group [de.dept_no, gender] (
-  aggregate [
-    salary_avg = average emp_salary,
-    salary_sd = stddev emp_salary,
-  ]
-)
-join departments [dept_no]
-select [dept_name, gender, salary_avg, salary_sd]
-</code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">WITH table_0 AS (
-  SELECT
-    emp_no,
-    gender,
-    AVG(salary) AS emp_salary
-  FROM
-    employees
-    JOIN salaries USING(emp_no)
-  GROUP BY
-    emp_no,
-    gender
-),
-table_1 AS (
-  SELECT
-    de.dept_no,
-    de.gender,
-    AVG(table_0.emp_salary) AS salary_avg,
-    STDDEV(table_0.emp_salary) AS salary_sd
-  FROM
-    table_0
-    LEFT JOIN dept_emp AS de USING(emp_no)
-  GROUP BY
-    de.dept_no,
-    de.gender
-)
-SELECT
-  departments.dept_name,
-  table_1.gender,
-  table_1.salary_avg,
-  table_1.salary_sd
-FROM
-  table_1
-  JOIN departments USING(dept_no)
-</code></pre>
-</div>
-</div>
+                        <h1 id="employees-1"><a class="header" href="#employees-1">Employees 1</a></h1>
 
                     </main>
 

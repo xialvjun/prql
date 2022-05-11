@@ -138,18 +138,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <p>Examples prefixed with employees are using <a href="https://github.com/vrajmohan/pgsql-sample-data.git">employees database</a>.</p>
-<p>Clone and init the database (requires a local PostgreSQL instance):</p>
-<pre><code>$ psql -U postgres -c 'CREATE DATABASE employees;'
-$ git clone https://github.com/vrajmohan/pgsql-sample-data.git
-$ psql -U postgres -d employees -f pgsql-sample-data/employee/employees.dump
-</code></pre>
-<p>Execute a PRQL query:</p>
-<pre><code>$ cargo run compile examples/employees/average-title-salary.prql | psql -U postgres -d employees
-</code></pre>
-<p>Also print the query:</p>
-<pre><code>$ cargo run compile my_file.prql | { tee /dev/stderr; echo -e &quot;\nResult:&quot; &gt;&amp;2 } | psql -U postgres -d employees
-</code></pre>
+                        <h1 id="examples"><a class="header" href="#examples">Examples</a></h1>
 
                     </main>
 
