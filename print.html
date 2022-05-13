@@ -1206,6 +1206,16 @@ as <code>func</code>.</li>
 The alternative is subqueries, which are fine at small scale, but become
 difficult to digest as complexity increases.</li>
 </ul>
+<h3 id="punctuation-summary"><a class="header" href="#punctuation-summary">Punctuation summary</a></h3>
+<p>A summary of how PRQL uses punctuation</p>
+<p>| Syntax   | Usage                   | Example                                                                      |
+| -------- | ----------------------- | ---------------------------------------------------------------------------- |
+| <code>:</code>      | Named args &amp; Parameters | <code>interp lower:0 1600 sat_score</code>                                              |
+| <code>=</code>      | Assigns &amp; Aliases       | <code>derive temp_c = (temp_f | celsius_of_fahrenheit)</code> <br> <code>from e = employees</code> |
+| <code>==</code>     | Equality comparison     | <code>join s=salaries [s.employee_id == employees.id]</code>                            |
+| <code>-&gt;</code>     | Function definitions    | <code>func add a b -&gt; a + b</code>                                                      |
+| <code>&lt;type&gt;</code> | Annotations             | <code>@2021-01-01&lt;datetime&gt;</code>                                                      |
+| <code>+</code>/<code>-</code>  | Sort order              | <code>sort [-amount, +date]</code>                                                      |</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="functions"><a class="header" href="#functions">Functions</a></h1>
 <!--
 TODOs:
