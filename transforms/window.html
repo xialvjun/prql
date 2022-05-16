@@ -147,14 +147,14 @@
 <li><code>rows</code>, which takes a range of rows relative to current row,</li>
 <li><code>range</code>, which takes a range of values relative to current row value.</li>
 </ul>
-<p>Start of the range is inclusive, end of range is exclusive. Index 0 references
-current row. If a bound is omitted, segment will extend until the end of the table (or group).</p>
+<p>Bounds of the range are inclusive. Index 0 references current row. If a
+bound is omitted, segment will extend until the edge of the table (or group).</p>
 <p>For example:</p>
 <ul>
-<li><code>rows:0..3</code>   means current row plus two following,</li>
-<li><code>rows:-2..1</code>  means two preceding rows plus current row,</li>
-<li><code>rows:-2..5</code>  means two preceding rows plus current row plus four following rows,</li>
-<li><code>rows:..1</code>    means all rows from the start of the table to and including current row,</li>
+<li><code>rows:0..2</code>   means current row plus two following,</li>
+<li><code>rows:-2..0</code>  means two preceding rows plus current row,</li>
+<li><code>rows:-2..4</code>  means two preceding rows plus current row plus four following rows,</li>
+<li><code>rows:..0</code>    means all rows from the start of the table to and including current row,</li>
 <li><code>rows:0..</code>    means current row and all following rows until the end of the table,</li>
 <li><code>rows:..</code>     means all rows, which same as not having window at all.</li>
 </ul>
@@ -164,16 +164,9 @@ current row. If a bound is omitted, segment will extend until the end of the tab
 <!-- TODO: rows vs range example, with visualization -->
 <p>For ease of use, there are two flags that override <code>rows</code> or <code>range</code>:</p>
 <ul>
-<li><code>expanding:true</code> is an alias for <code>rows:..1</code>. Sum using this window is also known as &quot;cumulative sum&quot;.</li>
-<li><code>rolling:x</code> is an alias for <code>row:(-x+1)..1</code>, where <code>x</code> is an integer. This will include <code>x</code> last values, including current row.</li>
+<li><code>expanding:true</code> is an alias for <code>rows:..0</code>. Sum using this window is also known as &quot;cumulative sum&quot;.</li>
+<li><code>rolling:n</code> is an alias for <code>row:(-n+1)..0</code>, where <code>n</code> is an integer. This will include <code>n</code> last values, including current row.</li>
 </ul>
-<blockquote>
-<p>Note: this row and range notation makes it easy to determine total number of rows included: <code>end - start</code>. In contrast, SQL does not make this easy with</p>
-<pre><code class="language-sql">BETWEEN 2 PRECEDING -- will include 3 rows
-</code></pre>
-<pre><code class="language-sql">BETWEEN 2 PRECEDING AND 1 FOLLOWING -- will include 4 rows
-</code></pre>
-</blockquote>
 <h2 id="example"><a class="header" href="#example">Example</a></h2>
 <div class="comparison">
 <div>
