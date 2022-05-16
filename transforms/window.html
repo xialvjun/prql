@@ -164,7 +164,7 @@ current row. If a bound is omitted, segment will extend until the end of the tab
 <!-- TODO: rows vs range example, with visualization -->
 <p>For ease of use, there are two flags that override <code>rows</code> or <code>range</code>:</p>
 <ul>
-<li><code>expanding:true</code> is an alias for <code>range:..1</code>. Sum using this window is also known as &quot;cumulative sum&quot;.</li>
+<li><code>expanding:true</code> is an alias for <code>rows:..1</code>. Sum using this window is also known as &quot;cumulative sum&quot;.</li>
 <li><code>rolling:x</code> is an alias for <code>row:(-x+1)..1</code>, where <code>x</code> is an integer. This will include <code>x</code> last values, including current row.</li>
 </ul>
 <blockquote>
@@ -203,7 +203,8 @@ group [order_month] (
   SUM(price) OVER (
     PARTITION BY order_month
     ORDER BY
-      day
+      day ROWS BETWEEN UNBOUNDED PRECEDING
+      AND CURRENT ROW
   ) AS monthly_running_total
 FROM
   orders
