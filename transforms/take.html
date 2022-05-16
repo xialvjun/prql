@@ -140,7 +140,7 @@
                     <main>
                         <h1 id="take"><a class="header" href="#take">Take</a></h1>
 <p>Picks rows based on their position.</p>
-<pre><code class="language-prql_no_test">take {n}
+<pre><code class="language-prql_no_test">take {n|range}
 </code></pre>
 <h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
 <div class="comparison">
@@ -161,11 +161,28 @@ LIMIT
 </code></pre>
 </div>
 </div>
-<h2 id="todo"><a class="header" href="#todo">Todo</a></h2>
-<p>We could support a range expression so we can get an offset:</p>
-<pre><code class="language-prql_no_test">from employees
-take 1..10
+<div class="comparison">
+<div>
+<h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
+<pre><code class="language-prql">from orders
+sort [-value, date]
+take 101..110
 </code></pre>
+</div>
+<div>
+<h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
+<pre><code class="language-sql">SELECT
+  orders.*
+FROM
+  orders
+ORDER BY
+  value DESC,
+  date
+LIMIT
+  10 OFFSET 100
+</code></pre>
+</div>
+</div>
 
                     </main>
 

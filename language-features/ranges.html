@@ -160,6 +160,30 @@ WHERE
 </div>
 </div>
 <p>Like in SQL, ranges are inclusive.</p>
+<p>As discussed in the <a href="../transforms/take.html">take</a> docs, ranges can also be used
+in <code>take</code>:</p>
+<div class="comparison">
+<div>
+<h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
+<pre><code class="language-prql">from orders
+sort [-value, date]
+take 101..110
+</code></pre>
+</div>
+<div>
+<h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
+<pre><code class="language-sql">SELECT
+  orders.*
+FROM
+  orders
+ORDER BY
+  value DESC,
+  date
+LIMIT
+  10 OFFSET 100
+</code></pre>
+</div>
+</div>
 
                     </main>
 
