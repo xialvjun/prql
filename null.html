@@ -154,10 +154,6 @@
 <li><code>null != null</code> evaluates to <code>false</code>,</li>
 <li>distinct column cannot contain multiple <code>null</code> values.</li>
 </ul>
-<p>This approach was discussed in <a href="https://github.com/prql/prql/issues/99">issue #99</a>.</p>
-<blockquote>
-<p>Note, currently <code>DISTINCT</code> is not yet implemented, see <a href="https://github.com/prql/prql/issues/292">#292</a></p>
-</blockquote>
 <div class="comparison">
 <div>
 <h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
@@ -178,6 +174,11 @@ WHERE
 </code></pre>
 </div>
 </div>
+<p>Note that PRQL doesn't change how <code>NULL</code> is compared between columns, for
+example in joins. (PRQL compiles to SQL and so can't change the behavior of the
+database).</p>
+<p>For more context or to provide feedback check out the discussion on
+<a href="https://github.com/prql/prql/issues/99">issue #99</a>.</p>
 
                     </main>
 
