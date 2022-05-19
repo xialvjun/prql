@@ -139,92 +139,97 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="syntax"><a class="header" href="#syntax">Syntax</a></h1>
-<!-- Here we could explain how function parameters work, what is a list, S-strings, how to do aliases and so on. -->
-<h2 id="lists"><a class="header" href="#lists">Lists</a></h2>
-<ul>
-<li>
-<p>Most keywords that take a single argument can also take a list, so these are equivalent:</p>
-<pre><code class="language-diff"> from employees
--select salary
-+select [salary]
-</code></pre>
-</li>
-<li>
-<p>More examples in <a href="examples/list-equivalence.html"><strong>list-equivalence.md</strong></a>.</p>
-</li>
-</ul>
-<h2 id="pipelines"><a class="header" href="#pipelines">Pipelines</a></h2>
-<ul>
-<li>A line-break generally creates a pipelined transformation. For example:</li>
-</ul>
+<h2 id="line-breaks---character"><a class="header" href="#line-breaks---character">Line-breaks &amp; <code>|</code> character</a></h2>
+<p>A line-break generally pipes the result of that line into the transform on
+the following line. For example, the <code>filter</code> and <code>select</code> transform operates on
+the result of the previous line:</p>
 <div class="comparison">
 <div>
 <h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
-<pre><code class="language-prql">from tbl
-select [
-  col1,
-  col2,
-]
-filter col1 == col2
+<pre><code class="language-prql">from employees
+filter department == &quot;Product&quot;
+select [first_name, last_name]
 </code></pre>
 </div>
 <div>
 <h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
 <pre><code class="language-sql">SELECT
-  col1,
-  col2
+  first_name,
+  last_name
 FROM
-  tbl
+  employees
 WHERE
-  col1 = col2
+  department = 'Product'
 </code></pre>
 </div>
 </div>
-<p>...is equivalent to:</p>
+<p>In the place of a line-break, it's also possible to use the <code>|</code> character to
+pipe results:</p>
 <div class="comparison">
 <div>
 <h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
-<pre><code class="language-prql">from tbl | select [col1, col2] | filter col1 == col2
+<pre><code class="language-prql">from employees | filter department == &quot;Product&quot; | select [first_name, last_name]
 </code></pre>
 </div>
 <div>
 <h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
 <pre><code class="language-sql">SELECT
-  col1,
-  col2
+  first_name,
+  last_name
 FROM
-  tbl
+  employees
 WHERE
-  col1 = col2
+  department = 'Product'
 </code></pre>
 </div>
 </div>
+<p>A line-break doesn't created a pipeline in a couple of cases:</p>
 <ul>
-<li>A line-break doesn't created a pipeline in a few cases:
-<ul>
-<li>Within a list (e.g. the <code>select</code> example above).</li>
-<li>When the following line is a new statement, by starting with a keyword such
-as <code>func</code>.</li>
+<li>Within a list (e.g. the <code>derive</code> examples below).</li>
+<li>When the following line is a new statement, by starting with a keyword such as
+<code>func</code>.</li>
 </ul>
-</li>
-</ul>
-<h2 id="ctes"><a class="header" href="#ctes">CTEs</a></h2>
-<ul>
-<li>See <a href="examples/cte.html">CTE Example</a>.</li>
-<li>This is no longer point-free, but that's a feature rather than a requirement.
-The alternative is subqueries, which are fine at small scale, but become
-difficult to digest as complexity increases.</li>
-</ul>
-<h2 id="punctuation-summary"><a class="header" href="#punctuation-summary">Punctuation summary</a></h2>
-<p>A summary of how PRQL uses punctuation</p>
+<h2 id="lists"><a class="header" href="#lists">Lists</a></h2>
+<p>Lists are represented with <code>[]</code>, and can span multiple lines. A final trailing
+comma is optional.</p>
+<div class="comparison">
+<div>
+<h4 id="prql-2"><a class="header" href="#prql-2">PRQL</a></h4>
+<pre><code class="language-prql">derive [x = 1, y = 2]
+derive [
+  a = x,
+  b = y
+]
+derive [
+  c = a,
+  d = b,
+]
+</code></pre>
+</div>
+<div>
+<h4 id="sql-2"><a class="header" href="#sql-2">SQL</a></h4>
+<pre><code class="language-sql">SELECT
+  1 AS x,
+  2 AS y,
+  1 AS a,
+  2 AS b,
+  1 AS c,
+  2 AS d
+</code></pre>
+</div>
+</div>
+<h2 id="syntax-summary"><a class="header" href="#syntax-summary">Syntax summary</a></h2>
+<p>A summary of PRQL syntax</p>
+<!-- We need to double escape the `|` characters because one of them is removed by cmark; ref https://github.com/prql/prql/issues/514. -->
 <table><thead><tr><th>Syntax</th><th>Usage</th><th>Example</th></tr></thead><tbody>
+<tr><td><code>|</code></td><td>Pipe</td><td><code>from employees | select first_name</code></td></tr>
+<tr><td><code>=</code></td><td>Assigns &amp; Aliases</td><td><code>derive temp_c = (c_of_f temp_f)</code> <br> <code>from e = employees</code></td></tr>
 <tr><td><code>:</code></td><td>Named args &amp; Parameters</td><td><code>interp lower:0 1600 sat_score</code></td></tr>
-<tr><td><code>=</code></td><td>Assigns &amp; Aliases</td><td>`derive temp_c = (temp_f</td></tr>
 <tr><td><code>==</code></td><td>Equality comparison</td><td><code>join s=salaries [s.employee_id == employees.id]</code></td></tr>
 <tr><td><code>-&gt;</code></td><td>Function definitions</td><td><code>func add a b -&gt; a + b</code></td></tr>
-<tr><td><code>&lt;type&gt;</code></td><td>Annotations</td><td><code>@2021-01-01&lt;datetime&gt;</code></td></tr>
 <tr><td><code>+</code>/<code>-</code></td><td>Sort order</td><td><code>sort [-amount, +date]</code></td></tr>
 <tr><td><code>??</code></td><td>Coalesce</td><td><code>amount ?? 0</code></td></tr>
+<tr><td><code>&lt;type&gt;</code></td><td>Annotations</td><td><code>@2021-01-01&lt;datetime&gt;</code></td></tr>
 </tbody></table>
 
                     </main>
