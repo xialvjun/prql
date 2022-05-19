@@ -139,8 +139,8 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="s-strings"><a class="header" href="#s-strings">S-Strings</a></h1>
-<p>An s-string inserts SQL directly, as an escape hatch when there's something that PRQL
-doesn't yet implement. For example, there's no <code>version()</code> function in SQL that
+<p>An s-string inserts SQL directly, as an escape hatch when there’s something that PRQL
+doesn’t yet implement. For example, there’s no <code>version()</code> function in SQL that
 returns the Postgres version, so if we want to use that, we use an s-string:</p>
 <div class="comparison">
 <div>
@@ -155,7 +155,7 @@ returns the Postgres version, so if we want to use that, we use an s-string:</p>
 </code></pre>
 </div>
 </div>
-<p>We can embed columns in an s-string using braces. For example, PRQL's standard
+<p>We can embed columns in an s-string using braces. For example, PRQL’s standard
 library defines the <code>average</code> function as:</p>
 <pre><code class="language-prql_no_test">func average column -&gt; s&quot;AVG({column})&quot;
 </code></pre>
@@ -176,7 +176,7 @@ FROM
 </code></pre>
 </div>
 </div>
-<p>Here's an example of a more involved use of an s-string:</p>
+<p>Here’s an example of a more involved use of an s-string:</p>
 <div class="comparison">
 <div>
 <h4 id="prql-2"><a class="header" href="#prql-2">PRQL</a></h4>
@@ -205,8 +205,8 @@ the result is SQL, rather than a string literal — a python f-string of
 <code>f&quot;average{col}&quot;</code> where <code>col=&quot;salary&quot;</code> would produce <code>&quot;average(salary)&quot;</code>, with
 the quotes.</p>
 <p>S-strings in user code are intended as an escape-hatch for an unimplemented
-feature. If we often need s-strings to express something, that's a sign we
-should implement it in PRQL or PRQL's stdlib.</p>
+feature. If we often need s-strings to express something, that’s a sign we
+should implement it in PRQL or PRQL’s stdlib.</p>
 
                     </main>
 

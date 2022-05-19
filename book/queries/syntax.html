@@ -163,7 +163,7 @@ WHERE
 </code></pre>
 </div>
 </div>
-<p>In the place of a line-break, it's also possible to use the <code>|</code> character to
+<p>In the place of a line-break, it’s also possible to use the <code>|</code> character to
 pipe results:</p>
 <div class="comparison">
 <div>
@@ -183,7 +183,7 @@ WHERE
 </code></pre>
 </div>
 </div>
-<p>A line-break doesn't created a pipeline in a couple of cases:</p>
+<p>A line-break doesn’t created a pipeline in a couple of cases:</p>
 <ul>
 <li>Within a list (e.g. the <code>derive</code> examples below).</li>
 <li>When the following line is a new statement, by starting with a keyword such as
@@ -222,7 +222,7 @@ derive [
 <p>A summary of PRQL syntax</p>
 <!-- We need to double escape the `|` characters because one of them is removed by cmark; ref https://github.com/prql/prql/issues/514. -->
 <table><thead><tr><th>Syntax</th><th>Usage</th><th>Example</th></tr></thead><tbody>
-<tr><td><code>|</code></td><td>Pipe</td><td><code>from employees | select first_name</code></td></tr>
+<tr><td><code>\</td><td></code></td><td>Pipe</td></tr>
 <tr><td><code>=</code></td><td>Assigns &amp; Aliases</td><td><code>derive temp_c = (c_of_f temp_f)</code> <br> <code>from e = employees</code></td></tr>
 <tr><td><code>:</code></td><td>Named args &amp; Parameters</td><td><code>interp lower:0 1600 sat_score</code></td></tr>
 <tr><td><code>==</code></td><td>Equality comparison</td><td><code>join s=salaries [s.employee_id == employees.id]</code></td></tr>

@@ -139,7 +139,7 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="distinct"><a class="header" href="#distinct">Distinct</a></h1>
-<p>PRQL doesn't have a specific <code>distinct</code> keyword. Instead, use <code>group</code> and <code>take 1</code>:</p>
+<p>PRQL doesn’t have a specific <code>distinct</code> keyword. Instead, use <code>group</code> and <code>take 1</code>:</p>
 <div class="comparison">
 <div>
 <h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
@@ -181,7 +181,7 @@ FROM
 <p>Note: <code>|</code> is here temporarily, until we finish work on function &amp; pipeline currying.</p>
 </blockquote>
 <h2 id="roadmap"><a class="header" href="#roadmap">Roadmap</a></h2>
-<p>Soon we'll be able to <a href="https://stackoverflow.com/questions/3800551/select-first-row-in-each-group-by-group">select range of rows in each
+<p>Soon we’ll be able to <a href="https://stackoverflow.com/questions/3800551/select-first-row-in-each-group-by-group">select range of rows in each
 group</a>
 by combining <code>group</code> and <code>sort</code>:</p>
 <pre><code class="language-prql_no_test"># youngest employee from each department
@@ -191,7 +191,7 @@ group department (
   take 1
 )
 </code></pre>
-<p>... which will produces ...</p>
+<p>… which will produces …</p>
 <pre><code class="language-sql">WITH table_0 = (
   SELECT ROW_NUMBER() OVER(PARTITION BY department ORDER_BY age) as _row_number
   FROM employees
@@ -200,7 +200,7 @@ SELECT *
 FROM table_0
 WHERE _row_number = 1
 </code></pre>
-<p>... or in Postgres dialect ...</p>
+<p>… or in Postgres dialect …</p>
 <pre><code class="language-sql">SELECT DISTINCT ON (department) *
 FROM employees
 ORDER BY department, age
@@ -240,6 +240,7 @@ WHERE
 </code></pre>
 </div>
 </div>
+
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

@@ -143,7 +143,7 @@
 TODOs:
 - Examples are a bit artificial — the interp is just "divide by 100" in one case!  -->
 <p>Functions are a fundamental abstraction in PRQL — they allow us to run code in
-many places that we've written once. This reduces the number of errors in our
+many places that we’ve written once. This reduces the number of errors in our
 code, makes our code more readable, and simplifies making changes.</p>
 <p>Functions have two types of parameters:</p>
 <ol>
@@ -199,10 +199,10 @@ FROM
 </div>
 </div>
 <h2 id="piping"><a class="header" href="#piping">Piping</a></h2>
-<p>Consistent with the principles of PRQL, it's possible to pipe values into
+<p>Consistent with the principles of PRQL, it’s possible to pipe values into
 functions, which makes composing many functions more readable. When piping a
 value into a function, the value is passed as an argument to the final
-positional parameter of the function. Here's the same result as the examples
+positional parameter of the function. Here’s the same result as the examples
 above with an alternative construction:</p>
 <div class="comparison">
 <div>
@@ -270,11 +270,11 @@ FROM
 </div>
 <h2 id="roadmap"><a class="header" href="#roadmap">Roadmap</a></h2>
 <h3 id="late-binding"><a class="header" href="#late-binding">Late binding</a></h3>
-<p>Currently, functions require a binding to variables in scope; they can't
+<p>Currently, functions require a binding to variables in scope; they can’t
 late-bind to column names; so for example:</p>
 <pre><code class="language-prql_no_test">func return price -&gt; (price - dividend) / price_yesterday
 </code></pre>
-<p>...isn't yet a valid function, and instead would needs to be:</p>
+<p>…isn’t yet a valid function, and instead would needs to be:</p>
 <pre><code class="language-prql_no_test">func return price dividend price_yesterday -&gt;  (price - dividend) / (price_yesterday)
 </code></pre>
 <p>(which makes functions in this case not useful)</p>

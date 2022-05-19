@@ -145,11 +145,11 @@
 your patience]</p>
 </blockquote>
 <p>PRQL is a modern language for transforming data — a simpler and more powerful
-SQL. Like SQL, it's readable, explicit and declarative. Unlike SQL, it forms a
+SQL. Like SQL, it’s readable, explicit and declarative. Unlike SQL, it forms a
 logical pipeline of transformations, and supports abstractions such as variables
 and functions. It can be used with any database that uses SQL, since it
 transpiles to SQL.</p>
-<p>Let's get started with an example:</p>
+<p>Let’s get started with an example:</p>
 <!-- TODO: resolve formatting — way too wide for the current preprocessor -->
 <div class="comparison">
 <div>
@@ -223,7 +223,7 @@ FROM
 </div>
 </div>
 <p>As you can see, PRQL is a linear <strong>pipeline of transformations</strong> — each line of the
-query is a transformation of the previous line's result.</p>
+query is a transformation of the previous line’s result.</p>
 <p>You can see that in SQL, operations do not follow one another, which makes it hard to compose larger queries.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="queries"><a class="header" href="#queries">Queries</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="pipelines"><a class="header" href="#pipelines">Pipelines</a></h1>
@@ -263,7 +263,7 @@ FROM
 </code></pre>
 </div>
 </div>
-<p>...and so on:</p>
+<p>…and so on:</p>
 <div class="comparison">
 <div>
 <h4 id="prql-3"><a class="header" href="#prql-3">PRQL</a></h4>
@@ -287,7 +287,7 @@ ORDER BY
 <h2 id="compiling-to-sql"><a class="header" href="#compiling-to-sql">Compiling to SQL</a></h2>
 <p>When compiling to SQL, the PRQL compiler will try to represent as many
 transforms as possible with a single <code>SELECT</code> statement. When necessary it will
-&quot;overflow&quot; using CTEs (common table expressions):</p>
+“overflow” using CTEs (common table expressions):</p>
 <div class="comparison">
 <div>
 <h4 id="prql-4"><a class="header" href="#prql-4">PRQL</a></h4>
@@ -329,7 +329,7 @@ FROM
 TODOs:
 - Examples are a bit artificial — the interp is just "divide by 100" in one case!  -->
 <p>Functions are a fundamental abstraction in PRQL — they allow us to run code in
-many places that we've written once. This reduces the number of errors in our
+many places that we’ve written once. This reduces the number of errors in our
 code, makes our code more readable, and simplifies making changes.</p>
 <p>Functions have two types of parameters:</p>
 <ol>
@@ -385,10 +385,10 @@ FROM
 </div>
 </div>
 <h2 id="piping"><a class="header" href="#piping">Piping</a></h2>
-<p>Consistent with the principles of PRQL, it's possible to pipe values into
+<p>Consistent with the principles of PRQL, it’s possible to pipe values into
 functions, which makes composing many functions more readable. When piping a
 value into a function, the value is passed as an argument to the final
-positional parameter of the function. Here's the same result as the examples
+positional parameter of the function. Here’s the same result as the examples
 above with an alternative construction:</p>
 <div class="comparison">
 <div>
@@ -456,11 +456,11 @@ FROM
 </div>
 <h2 id="roadmap"><a class="header" href="#roadmap">Roadmap</a></h2>
 <h3 id="late-binding"><a class="header" href="#late-binding">Late binding</a></h3>
-<p>Currently, functions require a binding to variables in scope; they can't
+<p>Currently, functions require a binding to variables in scope; they can’t
 late-bind to column names; so for example:</p>
 <pre><code class="language-prql_no_test">func return price -&gt; (price - dividend) / price_yesterday
 </code></pre>
-<p>...isn't yet a valid function, and instead would needs to be:</p>
+<p>…isn’t yet a valid function, and instead would needs to be:</p>
 <pre><code class="language-prql_no_test">func return price dividend price_yesterday -&gt;  (price - dividend) / (price_yesterday)
 </code></pre>
 <p>(which makes functions in this case not useful)</p>
@@ -503,7 +503,7 @@ FROM
 <p>In PRQL <code>table</code>s are far less common that CTEs are in SQL, since a single
 pipeline of logic can always be represented without simple pipelines alone.</p>
 <h2 id="roadmap-1"><a class="header" href="#roadmap-1">Roadmap</a></h2>
-<p>Currently it's not yet possible to have an
+<p>Currently it’s not yet possible to have an
 <a href="queries/./../language-features/s-strings.html">s-string</a> as a whole table. See
 <a href="https://github.com/prql/prql/issues/376">#376</a> for more details.</p>
 <!-- TODO: find an example that we can't currently represent with PRQL -->
@@ -539,7 +539,7 @@ WHERE
 </code></pre>
 </div>
 </div>
-<p>In the place of a line-break, it's also possible to use the <code>|</code> character to
+<p>In the place of a line-break, it’s also possible to use the <code>|</code> character to
 pipe results:</p>
 <div class="comparison">
 <div>
@@ -559,7 +559,7 @@ WHERE
 </code></pre>
 </div>
 </div>
-<p>A line-break doesn't created a pipeline in a couple of cases:</p>
+<p>A line-break doesn’t created a pipeline in a couple of cases:</p>
 <ul>
 <li>Within a list (e.g. the <code>derive</code> examples below).</li>
 <li>When the following line is a new statement, by starting with a keyword such as
@@ -598,7 +598,7 @@ derive [
 <p>A summary of PRQL syntax</p>
 <!-- We need to double escape the `|` characters because one of them is removed by cmark; ref https://github.com/prql/prql/issues/514. -->
 <table><thead><tr><th>Syntax</th><th>Usage</th><th>Example</th></tr></thead><tbody>
-<tr><td><code>|</code></td><td>Pipe</td><td><code>from employees | select first_name</code></td></tr>
+<tr><td><code>\</td><td></code></td><td>Pipe</td></tr>
 <tr><td><code>=</code></td><td>Assigns &amp; Aliases</td><td><code>derive temp_c = (c_of_f temp_f)</code> <br> <code>from e = employees</code></td></tr>
 <tr><td><code>:</code></td><td>Named args &amp; Parameters</td><td><code>interp lower:0 1600 sat_score</code></td></tr>
 <tr><td><code>==</code></td><td>Equality comparison</td><td><code>join s=salaries [s.employee_id == employees.id]</code></td></tr>
@@ -659,7 +659,7 @@ ORDER BY
 <h3 id="supported-dialects"><a class="header" href="#supported-dialects">Supported dialects</a></h3>
 <blockquote>
 <p>Note that dialect support is <em>very</em> early — most differences are not
-implemented, and most dialects' implementations are identical to <code>generic</code>'s.
+implemented, and most dialects’ implementations are identical to <code>generic</code>’s.
 Contributions are very welcome.</p>
 </blockquote>
 <ul>
@@ -683,11 +683,11 @@ from employees
 </code></pre>
 <p>This will allow the language to evolve without breaking existing queries.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="transforms"><a class="header" href="#transforms">Transforms</a></h1>
-<p>PRQL queries are a pipeline of transformations (&quot;transforms&quot;), where each transform takes
+<p>PRQL queries are a pipeline of transformations (“transforms”), where each transform takes
 the previous result and adjusts it in some way, before passing it onto to the
 next transform.</p>
 <p>Because PRQL focuses on modularity, we have far fewer transforms than SQL, each
-one fulfilling a specific purpose. That's often referred to as &quot;orthogonality&quot;.</p>
+one fulfilling a specific purpose. That’s often referred to as “orthogonality”.</p>
 <p>These are the currently available transforms:</p>
 <table><thead><tr><th>Transform</th><th>Purpose</th><th>SQL Equivalent</th></tr></thead><tbody>
 <tr><td><a href="./transforms/from.html"><strong><code>from</code></strong></a></td><td>Starts from a table</td><td><code>FROM</code></td></tr>
@@ -757,7 +757,8 @@ GROUP BY
   country
 </code></pre>
 </div>
-</div><div style="break-before: page; page-break-before: always;"></div><h1 id="derive"><a class="header" href="#derive">Derive</a></h1>
+</div>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="derive"><a class="header" href="#derive">Derive</a></h1>
 <p>Computes one or more new columns.</p>
 <pre><code class="language-prql_no_test">derive [{new_name} = {expression}]
 </code></pre>
@@ -814,7 +815,8 @@ literal in which case it can begin a pipeline <code>from</code>:</p>
   5 AS x
 </code></pre>
 </div>
-</div><div style="break-before: page; page-break-before: always;"></div><h1 id="filter"><a class="header" href="#filter">Filter</a></h1>
+</div>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="filter"><a class="header" href="#filter">Filter</a></h1>
 <p>Picks rows based on their values.</p>
 <pre><code class="language-prql_no_test">filter {boolean_expression}
 </code></pre>
@@ -855,7 +857,8 @@ WHERE
   AND 40
 </code></pre>
 </div>
-</div><div style="break-before: page; page-break-before: always;"></div><h1 id="from"><a class="header" href="#from">From</a></h1>
+</div>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="from"><a class="header" href="#from">From</a></h1>
 <p>Specifies a data source.</p>
 <pre><code class="language-prql_no_test">from {table_reference}
 </code></pre>
@@ -891,7 +894,8 @@ FROM
   employees AS e
 </code></pre>
 </div>
-</div><div style="break-before: page; page-break-before: always;"></div><h1 id="group"><a class="header" href="#group">Group</a></h1>
+</div>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="group"><a class="header" href="#group">Group</a></h1>
 <p>Partitions the rows into groups and applies a pipeline to each of the groups.</p>
 <pre><code class="language-prql_no_test">group [{key_columns}] {pipeline}
 </code></pre>
@@ -948,7 +952,7 @@ LIMIT
 </code></pre>
 </div>
 </div>
-<p>To find the employee who joined first in each department, it's exactly the
+<p>To find the employee who joined first in each department, it’s exactly the
 same pipeline, but within a <code>group</code> expression:</p>
 <blockquote>
 <p>Not yet implemented, ref <a href="https://github.com/prql/prql/issues/421">https://github.com/prql/prql/issues/421</a></p>
@@ -1030,7 +1034,8 @@ FROM
   LEFT JOIN positions AS p ON id = employee_id
 </code></pre>
 </div>
-</div><div style="break-before: page; page-break-before: always;"></div><h1 id="select"><a class="header" href="#select">Select</a></h1>
+</div>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="select"><a class="header" href="#select">Select</a></h1>
 <p>Picks and compute columns.</p>
 <pre><code class="language-prql_no_test">select [{assign_expression}]
 </code></pre>
@@ -1103,7 +1108,8 @@ FROM
   employees
 </code></pre>
 </div>
-</div><div style="break-before: page; page-break-before: always;"></div><h1 id="sort"><a class="header" href="#sort">Sort</a></h1>
+</div>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="sort"><a class="header" href="#sort">Sort</a></h1>
 <p>Orders rows based on the values of one or more columns.</p>
 <pre><code class="language-prql_no_test">sort [{direction}{column}]
 </code></pre>
@@ -1229,7 +1235,8 @@ LIMIT
   10 OFFSET 100
 </code></pre>
 </div>
-</div><div style="break-before: page; page-break-before: always;"></div><h1 id="window"><a class="header" href="#window">Window</a></h1>
+</div>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="window"><a class="header" href="#window">Window</a></h1>
 <p>Applies a pipeline to overlapping segments of rows.</p>
 <pre><code class="language-prql_no_test">window rows:{range} range:{range} expanding:false rolling:0 {pipeline}
 </code></pre>
@@ -1243,7 +1250,7 @@ omitted, the segment will extend until the edge of the table or group.</p>
 <!-- TODO: rows vs range example, with visualization -->
 <p>For ease of use, there are two flags that override <code>rows</code> or <code>range</code>:</p>
 <ul>
-<li><code>expanding:true</code> is an alias for <code>rows:..0</code>. Sum using this window is also known as &quot;cumulative sum&quot;.</li>
+<li><code>expanding:true</code> is an alias for <code>rows:..0</code>. Sum using this window is also known as “cumulative sum”.</li>
 <li><code>rolling:n</code> is an alias for <code>row:(-n+1)..0</code>, where <code>n</code> is an integer. This
 will include <code>n</code> last values, including current row.</li>
 </ul>
@@ -1305,7 +1312,8 @@ FROM
   orders
 </code></pre>
 </div>
-</div><div style="break-before: page; page-break-before: always;"></div><h1 id="language-features"><a class="header" href="#language-features">Language Features</a></h1>
+</div>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="language-features"><a class="header" href="#language-features">Language Features</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="coalesce"><a class="header" href="#coalesce">Coalesce</a></h1>
 <p>We can coalesce values with an <code>??</code> operator. Coalescing takes either the first
 value or, if that value is null, the second value.</p>
@@ -1325,14 +1333,15 @@ FROM
   orders
 </code></pre>
 </div>
-</div><div style="break-before: page; page-break-before: always;"></div><h1 id="dates--times"><a class="header" href="#dates--times">Dates &amp; Times</a></h1>
+</div>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="dates--times"><a class="header" href="#dates--times">Dates &amp; Times</a></h1>
 <p>PRQL uses <code>@</code> followed by a string to represent dates &amp; times. This is less
-verbose than SQL's approach of <code>TIMESTAMP '2004-10-19 10:23:54'</code> and more
-explicit than SQL's implicit option of just using a string <code>'2004-10-19 10:23:54'</code>.</p>
+verbose than SQL’s approach of <code>TIMESTAMP '2004-10-19 10:23:54'</code> and more
+explicit than SQL’s implicit option of just using a string <code>'2004-10-19 10:23:54'</code>.</p>
 <blockquote>
 <p>Currently PRQL passes strings which can be compiled straight through to the
 database, and so many compatible formats string may work, but we may refine this
-in the future to aid in compatibility across databases. We'll always support the
+in the future to aid in compatibility across databases. We’ll always support the
 canonical <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601</a> format described below.</p>
 </blockquote>
 <h2 id="dates"><a class="header" href="#dates">Dates</a></h2>
@@ -1399,9 +1408,9 @@ time.</p>
 <p>Intervals are represented by <code>{N}{periods}</code>, such as <code>2years</code> or <code>10minutes</code>,
 without a space.</p>
 <blockquote>
-<p>These aren't the same as ISO8601, because we evaluated <code>P3Y6M4DT12H30M5S</code> to
-be difficult to understand, but we could support a simplified form if there's
-demand for it. We don't currently support compound expressions, for example
+<p>These aren’t the same as ISO8601, because we evaluated <code>P3Y6M4DT12H30M5S</code> to
+be difficult to understand, but we could support a simplified form if there’s
+demand for it. We don’t currently support compound expressions, for example
 <code>2years10months</code>, but most DBs will allow <code>2years + 10months</code>. Please raise an
 issue if this is inconvenient.</p>
 </blockquote>
@@ -1423,11 +1432,11 @@ FROM
 </div>
 </div>
 <h2 id="examples-9"><a class="header" href="#examples-9">Examples</a></h2>
-<p>Here's a fuller list of examples:</p>
+<p>Here’s a fuller list of examples:</p>
 <ul>
 <li><code>@20221231</code> is forbidden — it must contain full punctuation (<code>-</code> and <code>:</code>),</li>
 <li><code>@2022-12-31</code> is a date</li>
-<li><code>@2022-12</code> or <code>@2022</code> are forbidden — SQL can't express a month, only a date</li>
+<li><code>@2022-12</code> or <code>@2022</code> are forbidden — SQL can’t express a month, only a date</li>
 <li><code>@16:54:32.123456</code> is a time</li>
 <li><code>@16:54:32</code>, <code>@16:54</code>, <code>@16</code> are all allowed, expressing <code>@16:54:32.000000</code>, <code>@16:54:00.000000</code>, <code>@16:00:00.000000</code> respectively</li>
 <li><code>@2022-12-31T16:54:32.123456</code> is a timestamp without timezone</li>
@@ -1451,7 +1460,7 @@ timestamp annotated as a datetime:</p>
 <li><code>@16:54&lt;datetime&gt;</code> is forbidden — datetime must specify date</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="distinct"><a class="header" href="#distinct">Distinct</a></h1>
-<p>PRQL doesn't have a specific <code>distinct</code> keyword. Instead, use <code>group</code> and <code>take 1</code>:</p>
+<p>PRQL doesn’t have a specific <code>distinct</code> keyword. Instead, use <code>group</code> and <code>take 1</code>:</p>
 <div class="comparison">
 <div>
 <h4 id="prql-45"><a class="header" href="#prql-45">PRQL</a></h4>
@@ -1493,7 +1502,7 @@ FROM
 <p>Note: <code>|</code> is here temporarily, until we finish work on function &amp; pipeline currying.</p>
 </blockquote>
 <h2 id="roadmap-4"><a class="header" href="#roadmap-4">Roadmap</a></h2>
-<p>Soon we'll be able to <a href="https://stackoverflow.com/questions/3800551/select-first-row-in-each-group-by-group">select range of rows in each
+<p>Soon we’ll be able to <a href="https://stackoverflow.com/questions/3800551/select-first-row-in-each-group-by-group">select range of rows in each
 group</a>
 by combining <code>group</code> and <code>sort</code>:</p>
 <pre><code class="language-prql_no_test"># youngest employee from each department
@@ -1503,7 +1512,7 @@ group department (
   take 1
 )
 </code></pre>
-<p>... which will produces ...</p>
+<p>… which will produces …</p>
 <pre><code class="language-sql">WITH table_0 = (
   SELECT ROW_NUMBER() OVER(PARTITION BY department ORDER_BY age) as _row_number
   FROM employees
@@ -1512,7 +1521,7 @@ SELECT *
 FROM table_0
 WHERE _row_number = 1
 </code></pre>
-<p>... or in Postgres dialect ...</p>
+<p>… or in Postgres dialect …</p>
 <pre><code class="language-sql">SELECT DISTINCT ON (department) *
 FROM employees
 ORDER BY department, age
@@ -1551,7 +1560,8 @@ WHERE
   rank = 1
 </code></pre>
 </div>
-</div><div style="break-before: page; page-break-before: always;"></div><h1 id="f-strings"><a class="header" href="#f-strings">F-Strings</a></h1>
+</div>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="f-strings"><a class="header" href="#f-strings">F-Strings</a></h1>
 <p>f-strings are a readable approach to building new strings from existing strings.
 Currently PRQL supports this for concatenating strings:</p>
 <div class="comparison">
@@ -1598,7 +1608,7 @@ FROM
 </div>
 <h2 id="roadmap-5"><a class="header" href="#roadmap-5">Roadmap</a></h2>
 <p>In the future, f-strings may incorporate string formatting such as datetimes,
-numbers, and padding. If there's a feature that would be helpful, please <a href="https://github.com/prql/prql/issues/new/">post
+numbers, and padding. If there’s a feature that would be helpful, please <a href="https://github.com/prql/prql/issues/new/">post
 an issue</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="null-handling"><a class="header" href="#null-handling">Null handling</a></h1>
 <p>SQL has an unconventional way of handling <code>NULL</code> values, since it treats them as
@@ -1637,8 +1647,8 @@ WHERE
 </code></pre>
 </div>
 </div>
-<p>Note that PRQL doesn't change how <code>NULL</code> is compared between columns, for
-example in joins. (PRQL compiles to SQL and so can't change the behavior of the
+<p>Note that PRQL doesn’t change how <code>NULL</code> is compared between columns, for
+example in joins. (PRQL compiles to SQL and so can’t change the behavior of the
 database).</p>
 <p>For more context or to provide feedback check out the discussion on
 <a href="https://github.com/prql/prql/issues/99">issue #99</a>.</p>
@@ -1688,9 +1698,10 @@ LIMIT
   10 OFFSET 100
 </code></pre>
 </div>
-</div><div style="break-before: page; page-break-before: always;"></div><h1 id="s-strings"><a class="header" href="#s-strings">S-Strings</a></h1>
-<p>An s-string inserts SQL directly, as an escape hatch when there's something that PRQL
-doesn't yet implement. For example, there's no <code>version()</code> function in SQL that
+</div>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="s-strings"><a class="header" href="#s-strings">S-Strings</a></h1>
+<p>An s-string inserts SQL directly, as an escape hatch when there’s something that PRQL
+doesn’t yet implement. For example, there’s no <code>version()</code> function in SQL that
 returns the Postgres version, so if we want to use that, we use an s-string:</p>
 <div class="comparison">
 <div>
@@ -1705,7 +1716,7 @@ returns the Postgres version, so if we want to use that, we use an s-string:</p>
 </code></pre>
 </div>
 </div>
-<p>We can embed columns in an s-string using braces. For example, PRQL's standard
+<p>We can embed columns in an s-string using braces. For example, PRQL’s standard
 library defines the <code>average</code> function as:</p>
 <pre><code class="language-prql_no_test">func average column -&gt; s&quot;AVG({column})&quot;
 </code></pre>
@@ -1726,7 +1737,7 @@ FROM
 </code></pre>
 </div>
 </div>
-<p>Here's an example of a more involved use of an s-string:</p>
+<p>Here’s an example of a more involved use of an s-string:</p>
 <div class="comparison">
 <div>
 <h4 id="prql-55"><a class="header" href="#prql-55">PRQL</a></h4>
@@ -1755,8 +1766,8 @@ the result is SQL, rather than a string literal — a python f-string of
 <code>f&quot;average{col}&quot;</code> where <code>col=&quot;salary&quot;</code> would produce <code>&quot;average(salary)&quot;</code>, with
 the quotes.</p>
 <p>S-strings in user code are intended as an escape-hatch for an unimplemented
-feature. If we often need s-strings to express something, that's a sign we
-should implement it in PRQL or PRQL's stdlib.</p>
+feature. If we often need s-strings to express something, that’s a sign we
+should implement it in PRQL or PRQL’s stdlib.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="strings"><a class="header" href="#strings">Strings</a></h1>
 <p>Strings in PRQL can use either single or double quotes:</p>
 <div class="comparison">
@@ -1785,7 +1796,7 @@ should implement it in PRQL or PRQL's stdlib.</p>
 </code></pre>
 </div>
 </div>
-<p>To quote a string containing quotes, either use the &quot;other&quot; type of quote, or
+<p>To quote a string containing quotes, either use the “other” type of quote, or
 use three-or-more quotes, and close with the same number.</p>
 <div class="comparison">
 <div>
@@ -1833,7 +1844,8 @@ quote in future versions.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="examples-10"><a class="header" href="#examples-10">Examples</a></h1>
 <p>These examples are rewritten from other languages such as SQL. They try to express real-world problems in PRQL, covering most of the language features. We are looking for different use-cases of data transformation, be it database queries, semnatic bussiness modeling or data cleaning.</p>
 <p>If you want to help, translate some of your queries to PRQL and <a href="https://github.com/prql/prql/pulls">open a PR</a> to add them here!</p>
-<!-- TODO: toc --><div style="break-before: page; page-break-before: always;"></div><div class="comparison">
+<!-- TODO: toc -->
+<div style="break-before: page; page-break-before: always;"></div><div class="comparison">
 <div>
 <h4 id="prql-61"><a class="header" href="#prql-61">PRQL</a></h4>
 <pre><code class="language-prql">from employees
@@ -1931,7 +1943,8 @@ LIMIT
   10
 </code></pre>
 </div>
-</div><div style="break-before: page; page-break-before: always;"></div><h2 id="single-item-is-coerced-into-a-list"><a class="header" href="#single-item-is-coerced-into-a-list">Single item is coerced into a list</a></h2>
+</div>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="single-item-is-coerced-into-a-list"><a class="header" href="#single-item-is-coerced-into-a-list">Single item is coerced into a list</a></h2>
 <div class="comparison">
 <div>
 <h4 id="prql-63"><a class="header" href="#prql-63">PRQL</a></h4>
@@ -2006,7 +2019,8 @@ FROM
   employees
 </code></pre>
 </div>
-</div><div style="break-before: page; page-break-before: always;"></div><p>This mostly works, apart from window clauses, and the version &amp; db args on the
+</div>
+<div style="break-before: page; page-break-before: always;"></div><p>This mostly works, apart from window clauses, and the version &amp; db args on the
 first line.</p>
 <pre><code class="language-prql_no_test">prql version:0.1 db:snowflake                         # Version number &amp; database name.
 
@@ -2090,7 +2104,8 @@ FROM
   JOIN average_salaries USING(country)
 </code></pre>
 </div>
-</div><div style="break-before: page; page-break-before: always;"></div><div class="comparison">
+</div>
+<div style="break-before: page; page-break-before: always;"></div><div class="comparison">
 <div>
 <h4 id="prql-68"><a class="header" href="#prql-68">PRQL</a></h4>
 <pre><code class="language-prql">from mytable
@@ -2107,7 +2122,8 @@ WHERE
   id = $1
 </code></pre>
 </div>
-</div><div style="break-before: page; page-break-before: always;"></div><h1 id="employees"><a class="header" href="#employees">Employees</a></h1>
+</div>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="employees"><a class="header" href="#employees">Employees</a></h1>
 <p>These are homework tasks on <a href="https://github.com/vrajmohan/pgsql-sample-data.git">employees database</a>.</p>
 <p>Clone and init the database (requires a local PostgreSQL instance):</p>
 <pre><code>$ psql -U postgres -c 'CREATE DATABASE employees;'
@@ -2360,6 +2376,7 @@ FROM
 </code></pre>
 </div>
 </div>
+
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
