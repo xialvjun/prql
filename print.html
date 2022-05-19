@@ -318,8 +318,7 @@ FROM
   JOIN department AS d USING(dept_no)
 </code></pre>
 </div>
-</div>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="syntax"><a class="header" href="#syntax">Syntax</a></h1>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="syntax"><a class="header" href="#syntax">Syntax</a></h1>
 <!-- Here we could explain how function parameters work, what is a list, S-strings, how to do aliases and so on. -->
 <h2 id="lists"><a class="header" href="#lists">Lists</a></h2>
 <ul>
@@ -398,15 +397,15 @@ difficult to digest as complexity increases.</li>
 </ul>
 <h2 id="punctuation-summary"><a class="header" href="#punctuation-summary">Punctuation summary</a></h2>
 <p>A summary of how PRQL uses punctuation</p>
-<p>| Syntax   | Usage                   | Example                                                                      |
-| -------- | ----------------------- | ---------------------------------------------------------------------------- |
-| <code>:</code>      | Named args &amp; Parameters | <code>interp lower:0 1600 sat_score</code>                                              |
-| <code>=</code>      | Assigns &amp; Aliases       | <code>derive temp_c = (temp_f | celsius_of_fahrenheit)</code> <br> <code>from e = employees</code> |
-| <code>==</code>     | Equality comparison     | <code>join s=salaries [s.employee_id == employees.id]</code>                            |
-| <code>-&gt;</code>     | Function definitions    | <code>func add a b -&gt; a + b</code>                                                      |
-| <code>&lt;type&gt;</code> | Annotations             | <code>@2021-01-01&lt;datetime&gt;</code>                                                      |
-| <code>+</code>/<code>-</code>  | Sort order              | <code>sort [-amount, +date]</code>                                                      |
-| <code>??</code>     | Coalesce                | <code>amount ?? 0</code>                                                      |</p>
+<table><thead><tr><th>Syntax</th><th>Usage</th><th>Example</th></tr></thead><tbody>
+<tr><td><code>:</code></td><td>Named args &amp; Parameters</td><td><code>interp lower:0 1600 sat_score</code></td></tr>
+<tr><td><code>=</code></td><td>Assigns &amp; Aliases</td><td>`derive temp_c = (temp_f</td></tr>
+<tr><td><code>==</code></td><td>Equality comparison</td><td><code>join s=salaries [s.employee_id == employees.id]</code></td></tr>
+<tr><td><code>-&gt;</code></td><td>Function definitions</td><td><code>func add a b -&gt; a + b</code></td></tr>
+<tr><td><code>&lt;type&gt;</code></td><td>Annotations</td><td><code>@2021-01-01&lt;datetime&gt;</code></td></tr>
+<tr><td><code>+</code>/<code>-</code></td><td>Sort order</td><td><code>sort [-amount, +date]</code></td></tr>
+<tr><td><code>??</code></td><td>Coalesce</td><td><code>amount ?? 0</code></td></tr>
+</tbody></table>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="query-header-dialect--version"><a class="header" href="#query-header-dialect--version">Query header: Dialect &amp; Version</a></h1>
 <h2 id="dialect"><a class="header" href="#dialect">Dialect</a></h2>
 <p>PRQL allows specifying a dialect at the top of the query, which allows PRQL to
@@ -490,17 +489,17 @@ next transform.</p>
 one fulfilling a specific purpose. That's often referred to as &quot;orthogonality&quot;.</p>
 <p>These are the currently available transforms:</p>
 <!-- Copied from `SUMMARY.md` -->
-<p>| Transform                   | Purpose                                                             |
-| --------------------------- | ------------------------------------------------------------------- |
-| <a href="./derive.html">Derive</a>       | Computes new columns                                                |
-| <a href="./select.html">Select</a>       | Picks &amp; computes columns                                            |
-| <a href="./filter.html">Filter</a>       | Picks rows based on their values                                    |
-| <a href="./sort.html">Sort</a>           | Orders rows based on the values of columns                          |
-| <a href="./join.html">Join</a>           | Adds columns from another table, matching rows based on a condition |
-| <a href="./take.html">Take</a>           | Picks rows based on their position                                  |
-| <a href="./group.html">Group</a>         | Partitions rows into groups and applies a pipeline to each of them  |
-| <a href="./aggregate.html">Aggregate</a> | Summarizes many rows into one row                                   |
-| <a href="./window.html">Window</a>       | Applies a pipeline to overlapping segments of rows                  |</p>
+<table><thead><tr><th>Transform</th><th>Purpose</th></tr></thead><tbody>
+<tr><td><a href="./derive.html">Derive</a></td><td>Computes new columns</td></tr>
+<tr><td><a href="./select.html">Select</a></td><td>Picks &amp; computes columns</td></tr>
+<tr><td><a href="./filter.html">Filter</a></td><td>Picks rows based on their values</td></tr>
+<tr><td><a href="./sort.html">Sort</a></td><td>Orders rows based on the values of columns</td></tr>
+<tr><td><a href="./join.html">Join</a></td><td>Adds columns from another table, matching rows based on a condition</td></tr>
+<tr><td><a href="./take.html">Take</a></td><td>Picks rows based on their position</td></tr>
+<tr><td><a href="./group.html">Group</a></td><td>Partitions rows into groups and applies a pipeline to each of them</td></tr>
+<tr><td><a href="./aggregate.html">Aggregate</a></td><td>Summarizes many rows into one row</td></tr>
+<tr><td><a href="./window.html">Window</a></td><td>Applies a pipeline to overlapping segments of rows</td></tr>
+</tbody></table>
 <div style="break-before: page; page-break-before: always;"></div><h2 id="aggregate"><a class="header" href="#aggregate">Aggregate</a></h2>
 <p>Summarizes many rows into one row.</p>
 <p>When applied:</p>
@@ -530,8 +529,7 @@ FROM
   employees
 </code></pre>
 </div>
-</div>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="derive"><a class="header" href="#derive">Derive</a></h1>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="derive"><a class="header" href="#derive">Derive</a></h1>
 <p>Computes one or more new columns.</p>
 <pre><code class="language-prql_no_test">derive [{new_name} = {expression}]
 </code></pre>
@@ -588,8 +586,7 @@ literal, and doesn't require a <code>from</code>:</p>
   5 AS x
 </code></pre>
 </div>
-</div>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="filter"><a class="header" href="#filter">Filter</a></h1>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="filter"><a class="header" href="#filter">Filter</a></h1>
 <p>Picks rows based on their values.</p>
 <pre><code class="language-prql_no_test">filter {boolean_expression}
 </code></pre>
@@ -630,8 +627,7 @@ WHERE
   AND 40
 </code></pre>
 </div>
-</div>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="from"><a class="header" href="#from">From</a></h1>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="from"><a class="header" href="#from">From</a></h1>
 <p>Specifies a data source.</p>
 <pre><code class="language-prql_no_test">from {table_reference}
 </code></pre>
@@ -667,8 +663,7 @@ FROM
   employees AS e
 </code></pre>
 </div>
-</div>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="group"><a class="header" href="#group">Group</a></h1>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="group"><a class="header" href="#group">Group</a></h1>
 <p>Partitions the rows into groups and applies a pipeline to each of the groups.</p>
 <pre><code class="language-prql_no_test">group [{key column}] {pipeline}
 </code></pre>
@@ -806,8 +801,7 @@ FROM
   LEFT JOIN positions AS p ON id = employee_id
 </code></pre>
 </div>
-</div>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="select"><a class="header" href="#select">Select</a></h1>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="select"><a class="header" href="#select">Select</a></h1>
 <p>Picks and compute columns.</p>
 <pre><code class="language-prql_no_test">select [{assign_expression}]
 </code></pre>
@@ -880,8 +874,7 @@ FROM
   employees
 </code></pre>
 </div>
-</div>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="sort"><a class="header" href="#sort">Sort</a></h1>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="sort"><a class="header" href="#sort">Sort</a></h1>
 <p>Orders rows based on the values of one or more columns.</p>
 <pre><code class="language-prql_no_test">sort [{direction}{column}]
 </code></pre>
@@ -955,8 +948,7 @@ ORDER BY
   salary
 </code></pre>
 </div>
-</div>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="take"><a class="header" href="#take">Take</a></h1>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="take"><a class="header" href="#take">Take</a></h1>
 <p>Picks rows based on their position.</p>
 <pre><code class="language-prql_no_test">take {n|range}
 </code></pre>
@@ -1000,8 +992,7 @@ LIMIT
   10 OFFSET 100
 </code></pre>
 </div>
-</div>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="window"><a class="header" href="#window">Window</a></h1>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="window"><a class="header" href="#window">Window</a></h1>
 <p>Applies a pipeline to overlapping segments of rows.</p>
 <pre><code class="language-prql_no_test">window rows:.. range:.. expanding:false rolling:0 {pipeline}
 </code></pre>
@@ -1066,11 +1057,9 @@ FROM
   orders
 </code></pre>
 </div>
-</div>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="language-features"><a class="header" href="#language-features">Language Features</a></h1>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="language-features"><a class="header" href="#language-features">Language Features</a></h1>
 <p>PRQL improves on many of SQL's awkward language features:</p>
-<!-- toc -->
-<div style="break-before: page; page-break-before: always;"></div><h1 id="coalesce"><a class="header" href="#coalesce">Coalesce</a></h1>
+<!-- toc --><div style="break-before: page; page-break-before: always;"></div><h1 id="coalesce"><a class="header" href="#coalesce">Coalesce</a></h1>
 <p>We can coalesce values with an <code>??</code> operator. Coalescing takes either the first
 value or, if that value is null, the second value.</p>
 <div class="comparison">
@@ -1089,8 +1078,7 @@ FROM
   orders
 </code></pre>
 </div>
-</div>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="dates--times"><a class="header" href="#dates--times">Dates &amp; Times</a></h1>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="dates--times"><a class="header" href="#dates--times">Dates &amp; Times</a></h1>
 <p>PRQL uses a pattern of prefacing strings with their type to represent dates.
 This is less verbose than SQL's approach of <code>TIMESTAMP '2004-10-19 10:23:54'</code>
 and more explicit than SQL's implicit option of just using a string <code>'2004-10-19 10:23:54'</code>.</p>
@@ -1316,8 +1304,7 @@ WHERE
   rank = 1
 </code></pre>
 </div>
-</div>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="f-strings"><a class="header" href="#f-strings">F-Strings</a></h1>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="f-strings"><a class="header" href="#f-strings">F-Strings</a></h1>
 <p>f-strings are a readable approach to building new strings from existing strings.
 Currently PRQL supports this for concatenating strings:</p>
 <div class="comparison">
@@ -1591,8 +1578,7 @@ LIMIT
   10 OFFSET 100
 </code></pre>
 </div>
-</div>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="s-strings"><a class="header" href="#s-strings">S-Strings</a></h1>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="s-strings"><a class="header" href="#s-strings">S-Strings</a></h1>
 <p>An s-string inserts SQL directly, as an escape hatch when there's something that PRQL
 doesn't yet implement. For example, there's no <code>version()</code> function in SQL that
 returns the Postgres version, so if we want to use that, we use an s-string:</p>
@@ -1746,12 +1732,10 @@ we didn't need scrollbars, but it didn't work well on Chrome. -->
         visibility: hidden;
     }
 </style>
-<embed class="container-container" type="text/html" src="./dist/index.html">
-<div style="break-before: page; page-break-before: always;"></div><h1 id="examples-10"><a class="header" href="#examples-10">Examples</a></h1>
+<embed class="container-container" type="text/html" src="./dist/index.html"><div style="break-before: page; page-break-before: always;"></div><h1 id="examples-10"><a class="header" href="#examples-10">Examples</a></h1>
 <p>These examples are rewritten from other languages such as SQL. They try to express real-world problems in PRQL, covering most of the language features. We are looking for different use-cases of data transformation, be it database queries, semnatic bussiness modeling or data cleaning.</p>
 <p>If you want to help, translate some of your queries to PRQL and <a href="https://github.com/prql/prql/pulls">open a PR</a> to add them here!</p>
-<!-- TODO: toc -->
-<div style="break-before: page; page-break-before: always;"></div><div class="comparison">
+<!-- TODO: toc --><div style="break-before: page; page-break-before: always;"></div><div class="comparison">
 <div>
 <h4 id="prql-57"><a class="header" href="#prql-57">PRQL</a></h4>
 <pre><code class="language-prql">from employees
@@ -1849,8 +1833,7 @@ LIMIT
   10
 </code></pre>
 </div>
-</div>
-<div style="break-before: page; page-break-before: always;"></div><h2 id="single-item-is-coerced-into-a-list"><a class="header" href="#single-item-is-coerced-into-a-list">Single item is coerced into a list</a></h2>
+</div><div style="break-before: page; page-break-before: always;"></div><h2 id="single-item-is-coerced-into-a-list"><a class="header" href="#single-item-is-coerced-into-a-list">Single item is coerced into a list</a></h2>
 <div class="comparison">
 <div>
 <h4 id="prql-59"><a class="header" href="#prql-59">PRQL</a></h4>
@@ -1925,8 +1908,7 @@ FROM
   employees
 </code></pre>
 </div>
-</div>
-<div style="break-before: page; page-break-before: always;"></div><p>This mostly works, apart from window clauses, and the version &amp; db args on the
+</div><div style="break-before: page; page-break-before: always;"></div><p>This mostly works, apart from window clauses, and the version &amp; db args on the
 first line.</p>
 <pre><code class="language-prql_no_test">prql version:0.1 db:snowflake                         # Version number &amp; database name.
 
@@ -2010,8 +1992,7 @@ FROM
   JOIN average_salaries USING(country)
 </code></pre>
 </div>
-</div>
-<div style="break-before: page; page-break-before: always;"></div><div class="comparison">
+</div><div style="break-before: page; page-break-before: always;"></div><div class="comparison">
 <div>
 <h4 id="prql-64"><a class="header" href="#prql-64">PRQL</a></h4>
 <pre><code class="language-prql">from mytable
@@ -2028,8 +2009,7 @@ WHERE
   id = $1
 </code></pre>
 </div>
-</div>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="employees"><a class="header" href="#employees">Employees</a></h1>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="employees"><a class="header" href="#employees">Employees</a></h1>
 <p>These are homework tasks on <a href="https://github.com/vrajmohan/pgsql-sample-data.git">employees database</a>.</p>
 <p>Clone and init the database (requires a local PostgreSQL instance):</p>
 <pre><code>$ psql -U postgres -c 'CREATE DATABASE employees;'
@@ -2282,7 +2262,6 @@ FROM
 </code></pre>
 </div>
 </div>
-
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

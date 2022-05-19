@@ -217,15 +217,15 @@ difficult to digest as complexity increases.</li>
 </ul>
 <h2 id="punctuation-summary"><a class="header" href="#punctuation-summary">Punctuation summary</a></h2>
 <p>A summary of how PRQL uses punctuation</p>
-<p>| Syntax   | Usage                   | Example                                                                      |
-| -------- | ----------------------- | ---------------------------------------------------------------------------- |
-| <code>:</code>      | Named args &amp; Parameters | <code>interp lower:0 1600 sat_score</code>                                              |
-| <code>=</code>      | Assigns &amp; Aliases       | <code>derive temp_c = (temp_f | celsius_of_fahrenheit)</code> <br> <code>from e = employees</code> |
-| <code>==</code>     | Equality comparison     | <code>join s=salaries [s.employee_id == employees.id]</code>                            |
-| <code>-&gt;</code>     | Function definitions    | <code>func add a b -&gt; a + b</code>                                                      |
-| <code>&lt;type&gt;</code> | Annotations             | <code>@2021-01-01&lt;datetime&gt;</code>                                                      |
-| <code>+</code>/<code>-</code>  | Sort order              | <code>sort [-amount, +date]</code>                                                      |
-| <code>??</code>     | Coalesce                | <code>amount ?? 0</code>                                                      |</p>
+<table><thead><tr><th>Syntax</th><th>Usage</th><th>Example</th></tr></thead><tbody>
+<tr><td><code>:</code></td><td>Named args &amp; Parameters</td><td><code>interp lower:0 1600 sat_score</code></td></tr>
+<tr><td><code>=</code></td><td>Assigns &amp; Aliases</td><td>`derive temp_c = (temp_f</td></tr>
+<tr><td><code>==</code></td><td>Equality comparison</td><td><code>join s=salaries [s.employee_id == employees.id]</code></td></tr>
+<tr><td><code>-&gt;</code></td><td>Function definitions</td><td><code>func add a b -&gt; a + b</code></td></tr>
+<tr><td><code>&lt;type&gt;</code></td><td>Annotations</td><td><code>@2021-01-01&lt;datetime&gt;</code></td></tr>
+<tr><td><code>+</code>/<code>-</code></td><td>Sort order</td><td><code>sort [-amount, +date]</code></td></tr>
+<tr><td><code>??</code></td><td>Coalesce</td><td><code>amount ?? 0</code></td></tr>
+</tbody></table>
 
                     </main>
 
