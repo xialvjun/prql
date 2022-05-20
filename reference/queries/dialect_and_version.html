@@ -206,13 +206,26 @@ Contributions are very welcome.</p>
 <li><code>snowflake</code></li>
 </ul>
 <h2 id="version"><a class="header" href="#version">Version</a></h2>
-<p>While not yet implemented, PRQL will allow specifying a version of the language
-in the PRQL header, like:</p>
-<pre><code class="language-prql_no_test">prql version:1
+<p>PRQL allows specifying a version of the language in the PRQL header, like:</p>
+<div class="comparison">
+<div>
+<h4 id="prql-2"><a class="header" href="#prql-2">PRQL</a></h4>
+<pre><code class="language-prql">prql version:1
 
 from employees
 </code></pre>
-<p>This will allow the language to evolve without breaking existing queries.</p>
+</div>
+<div>
+<h4 id="sql-2"><a class="header" href="#sql-2">SQL</a></h4>
+<pre><code class="language-sql">SELECT
+  employees.*
+FROM
+  employees
+</code></pre>
+</div>
+</div>
+<p>When the functionality is implemented, it will allow the language to evolve
+without breaking existing queries.</p>
 
                     </main>
 
