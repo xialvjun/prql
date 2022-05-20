@@ -139,10 +139,30 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="syntax"><a class="header" href="#syntax">Syntax</a></h1>
-<h2 id="line-breaks---character"><a class="header" href="#line-breaks---character">Line-breaks &amp; <code>|</code> character</a></h2>
-<p>A line-break generally pipes the result of that line into the transform on
-the following line. For example, the <code>filter</code> and <code>select</code> transform operates on
-the result of the previous line:</p>
+<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
+<p>A summary of PRQL syntax</p>
+<!-- The `|` characters need to be escaped, and surrounded with tags rather than backticks -->
+<table><thead><tr><th>Syntax</th><th>Usage</th><th>Example</th></tr></thead><tbody>
+<tr><td><code>|</code></td><td>Pipe</td><td><code>from employees | select first_name</code></td></tr>
+<tr><td><code>=</code></td><td>Assigns &amp; Aliases</td><td><code>from e = employees</code> <br> <code>derive total = (sum salary)</code></td></tr>
+<tr><td><code>:</code></td><td>Named args &amp; Parameters</td><td><code>interp lower:0 1600 sat_score</code></td></tr>
+<tr><td><code>[]</code></td><td>List</td><td><code>select [id, amount]</code></td></tr>
+<tr><td><code>()</code></td><td>Precedence</td><td><code>derive fahrenheit = (celsius - 32) * 1.8</code></td></tr>
+<tr><td><code>#</code></td><td>Comment</td><td><code># A comment</code></td></tr>
+<tr><td><code>@</code></td><td>Date &amp; times</td><td><code>@2021-01-01</code></td></tr>
+<tr><td><code>==</code></td><td>Equality comparison</td><td><code>join s=salaries [s.emp_id == e.id]</code></td></tr>
+<tr><td><code>-&gt;</code></td><td>Function definitions</td><td><code>func add a b -&gt; a + b</code></td></tr>
+<tr><td><code>+</code>/<code>-</code></td><td>Sort order</td><td><code>sort [-amount, +date]</code></td></tr>
+<tr><td><code>??</code></td><td>Coalesce</td><td><code>amount ?? 0</code></td></tr>
+<tr><td><code>&lt;type&gt;</code></td><td>Annotations</td><td><code>@2021-01-01&lt;datetime&gt;</code></td></tr>
+</tbody></table>
+<h2 id="pipes"><a class="header" href="#pipes">Pipes</a></h2>
+<p>Pipes — the connection between <a href="../transforms.html">transforms</a> that make up a
+pipeline — can be either line breaks or a pipe character (<code>|</code>).</p>
+<p>In almost all situations, line-breaks pipe the result of a line’s transform into the transform on
+the following line. For example, the <code>filter</code> transform operates on the result
+of <code>from employees</code> (which is just the <code>employees</code> table), and the <code>select</code> transform operates on
+the result of the <code>filter</code> transform.</p>
 <div class="comparison">
 <div>
 <h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
@@ -164,7 +184,7 @@ WHERE
 </div>
 </div>
 <p>In the place of a line-break, it’s also possible to use the <code>|</code> character to
-pipe results:</p>
+pipe results, such that this is equivalent:</p>
 <div class="comparison">
 <div>
 <h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
@@ -186,8 +206,8 @@ WHERE
 <p>A line-break doesn’t created a pipeline in a couple of cases:</p>
 <ul>
 <li>Within a list (e.g. the <code>derive</code> examples below).</li>
-<li>When the following line is a new statement, by starting with a keyword such as
-<code>func</code>.</li>
+<li>When the following line is a new statement, which starts with a keyword of
+<code>func</code>, <code>table</code> or <code>from</code>.</li>
 </ul>
 <h2 id="lists"><a class="header" href="#lists">Lists</a></h2>
 <p>Lists are represented with <code>[]</code>, and can span multiple lines. A final trailing
@@ -218,19 +238,115 @@ derive [
 </code></pre>
 </div>
 </div>
-<h2 id="syntax-summary"><a class="header" href="#syntax-summary">Syntax summary</a></h2>
-<p>A summary of PRQL syntax</p>
-<!-- We need to double escape the `|` characters because one of them is removed by cmark; ref https://github.com/prql/prql/issues/514. -->
-<table><thead><tr><th>Syntax</th><th>Usage</th><th>Example</th></tr></thead><tbody>
-<tr><td><code>\</td><td></code></td><td>Pipe</td></tr>
-<tr><td><code>=</code></td><td>Assigns &amp; Aliases</td><td><code>derive temp_c = (c_of_f temp_f)</code> <br> <code>from e = employees</code></td></tr>
-<tr><td><code>:</code></td><td>Named args &amp; Parameters</td><td><code>interp lower:0 1600 sat_score</code></td></tr>
-<tr><td><code>==</code></td><td>Equality comparison</td><td><code>join s=salaries [s.employee_id == employees.id]</code></td></tr>
-<tr><td><code>-&gt;</code></td><td>Function definitions</td><td><code>func add a b -&gt; a + b</code></td></tr>
-<tr><td><code>+</code>/<code>-</code></td><td>Sort order</td><td><code>sort [-amount, +date]</code></td></tr>
-<tr><td><code>??</code></td><td>Coalesce</td><td><code>amount ?? 0</code></td></tr>
-<tr><td><code>&lt;type&gt;</code></td><td>Annotations</td><td><code>@2021-01-01&lt;datetime&gt;</code></td></tr>
-</tbody></table>
+<p>Most transforms can take either a list or a single item, so these are
+equivalent:</p>
+<div class="comparison">
+<div>
+<h4 id="prql-3"><a class="header" href="#prql-3">PRQL</a></h4>
+<pre><code class="language-prql">from employees
+select [first_name]
+</code></pre>
+</div>
+<div>
+<h4 id="sql-3"><a class="header" href="#sql-3">SQL</a></h4>
+<pre><code class="language-sql">SELECT
+  first_name
+FROM
+  employees
+</code></pre>
+</div>
+</div>
+<div class="comparison">
+<div>
+<h4 id="prql-4"><a class="header" href="#prql-4">PRQL</a></h4>
+<pre><code class="language-prql">from employees
+select first_name
+</code></pre>
+</div>
+<div>
+<h4 id="sql-4"><a class="header" href="#sql-4">SQL</a></h4>
+<pre><code class="language-sql">SELECT
+  first_name
+FROM
+  employees
+</code></pre>
+</div>
+</div>
+<h2 id="parentheses"><a class="header" href="#parentheses">Parentheses</a></h2>
+<p>Parentheses — <code>()</code> — are used to give precedence to inner expressions, as is the
+case in almost all languages / math.</p>
+<p>In particular, parentheses are used to nest pipelines for transforms such as
+<code>group</code> and <code>window</code>, which take a pipeline. Here, the <code>aggregate</code> pipeline is
+applied to each group of unique <code>title</code> and <code>country</code> values.</p>
+<div class="comparison">
+<div>
+<h4 id="prql-5"><a class="header" href="#prql-5">PRQL</a></h4>
+<pre><code class="language-prql">from employees
+group [title, country] (
+  aggregate [
+    average salary,
+    ct = count
+  ]
+)
+</code></pre>
+</div>
+<div>
+<h4 id="sql-5"><a class="header" href="#sql-5">SQL</a></h4>
+<pre><code class="language-sql">SELECT
+  title,
+  country,
+  AVG(salary),
+  COUNT(*) AS ct
+FROM
+  employees
+GROUP BY
+  title,
+  country
+</code></pre>
+</div>
+</div>
+<h2 id="comments"><a class="header" href="#comments">Comments</a></h2>
+<p>Comments are represented by <code>#</code>. Currently only single line comments exist.</p>
+<div class="comparison">
+<div>
+<h4 id="prql-6"><a class="header" href="#prql-6">PRQL</a></h4>
+<pre><code class="language-prql">from employees  # Comment 1
+# Comment 2
+aggregate [average salary]
+</code></pre>
+</div>
+<div>
+<h4 id="sql-6"><a class="header" href="#sql-6">SQL</a></h4>
+<pre><code class="language-sql">SELECT
+  AVG(salary)
+FROM
+  employees
+</code></pre>
+</div>
+</div>
+<h2 id="roadmap"><a class="header" href="#roadmap">Roadmap</a></h2>
+<p>Currently we don’t yet “curry” a pipeline. As a result, an inline pipeline which
+doesn’t begin with a line-break — generally a very short pipeline —
+to start with a line-break or a <code>|</code> character:</p>
+<div class="comparison">
+<div>
+<h4 id="prql-7"><a class="header" href="#prql-7">PRQL</a></h4>
+<pre><code class="language-prql">from employees
+select department
+group department ( | take 1)
+</code></pre>
+</div>
+<div>
+<h4 id="sql-7"><a class="header" href="#sql-7">SQL</a></h4>
+<pre><code class="language-sql">SELECT
+  DISTINCT department
+FROM
+  employees
+</code></pre>
+</div>
+</div>
+<p>We’ll be able to replace <code>( | take 1)</code> with <code>(take 1)</code> in the future; see
+<a href="https://github.com/prql/prql/issues/414">#414</a> for more details.</p>
 
                     </main>
 
