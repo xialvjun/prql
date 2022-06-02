@@ -26,6 +26,7 @@
 
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="../comparison-table.css">
+        <link rel="stylesheet" href="../././mdbook-admonish.css">
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -177,11 +178,10 @@ FROM
 </code></pre>
 </div>
 </div>
-<blockquote>
-<p>Note: <code>|</code> is here temporarily, until we finish work on function &amp; pipeline currying.</p>
-</blockquote>
-<hr />
-<p>We are be able to <a href="https://stackoverflow.com/questions/3800551/select-first-row-in-each-group-by-group">select range of rows in each
+<pre><code class="language-admonish note">Note: `|` is required in `( | take 1)` temporarily, until we finish implementing function &amp; pipeline currying.
+</code></pre>
+<h2 id="selecting-from-each-group"><a class="header" href="#selecting-from-each-group">Selecting from each group</a></h2>
+<p>We are be able to <a href="https://stackoverflow.com/questions/3800551/select-first-row-in-each-group-by-group">select a rows from each
 group</a>
 by combining <code>group</code> and <code>sort</code>:</p>
 <div class="comparison">

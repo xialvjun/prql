@@ -27,6 +27,7 @@
 
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="comparison-table.css">
+        <link rel="stylesheet" href="././mdbook-admonish.css">
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -1082,9 +1083,8 @@ LIMIT
 </div>
 <p>To find the employee who joined first in each department, it’s exactly the
 same pipeline, but within a <code>group</code> expression:</p>
-<blockquote>
-<p>Not yet implemented, ref <a href="https://github.com/prql/prql/issues/421">https://github.com/prql/prql/issues/421</a></p>
-</blockquote>
+<pre><code class="language-admonish todo">This isn't yet implemented, ref &lt;https://github.com/prql/prql/issues/421&gt;
+</code></pre>
 <pre><code class="language-prql_no_test">from employees
 group role (
   sort join_date  # taken from above
@@ -1102,8 +1102,8 @@ group role (
 <li>List of conditions
 <ul>
 <li>If all terms are column identifiers, this will compile to <code>USING(...)</code>. In
-this case, both of the tables must have specified columns. The result will
-only contain one column for each specified column.</li>
+this case, both tables must contain specified columns. The result will only
+contain one column for each specified column.</li>
 </ul>
 </li>
 </ul>
@@ -1361,22 +1361,30 @@ LIMIT
 </div>
 </div>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="window"><a class="header" href="#window">Window</a></h1>
-<p>Applies a pipeline to overlapping segments of rows.</p>
+<p>Applies a pipeline to segments of rows, producing one output value for every
+input value.</p>
 <pre><code class="language-prql_no_test">window rows:{range} range:{range} expanding:false rolling:0 {pipeline}
 </code></pre>
-<p>For each row in result, its input segment is determined by one of:</p>
+<p>For each row, the segment over which the pipeline is applied is determined by
+one of:</p>
 <ul>
-<li><code>rows</code>, which takes a range of rows relative to the current row.</li>
+<li><code>rows</code>, which takes a range of rows relative to the current row.
+<ul>
+<li><code>0</code> references the current row.</li>
+</ul>
+</li>
 <li><code>range</code>, which takes a range of values relative to current row value.</li>
 </ul>
-<p>Bounds of the range are inclusive. <code>0</code> references current row. If a bound is
-omitted, the segment will extend until the edge of the table or group.</p>
+<p>The bounds of the range are inclusive. If a bound is omitted, the segment will
+extend until the edge of the table or group.</p>
 <!-- TODO: rows vs range example, with visualization -->
 <p>For ease of use, there are two flags that override <code>rows</code> or <code>range</code>:</p>
 <ul>
-<li><code>expanding:true</code> is an alias for <code>rows:..0</code>. Sum using this window is also known as “cumulative sum”.</li>
+<li><code>expanding:true</code> is an alias for <code>rows:..0</code>. A sum using this window is also
+known as “cumulative sum”.</li>
 <li><code>rolling:n</code> is an alias for <code>row:(-n+1)..0</code>, where <code>n</code> is an integer. This
-will include <code>n</code> last values, including current row.</li>
+will include <code>n</code> last values, including current row. An average using this
+window is also knows as a Simple Moving Average.</li>
 </ul>
 <p>Some examples:</p>
 <table><thead><tr><th>Expression</th><th>Meaning</th></tr></thead><tbody>
@@ -1396,8 +1404,8 @@ will include <code>n</code> last values, including current row.</li>
 <pre><code class="language-prql">from employees
 group employee_id (
   sort month
-  window rows:-5.. (
-    derive [semi_annual_comp = sum paycheck]
+  window rolling:12 (
+    derive [trail_12_m_comp = sum paycheck]
   )
 )
 </code></pre>
@@ -1409,9 +1417,9 @@ group employee_id (
   SUM(paycheck) OVER (
     PARTITION BY employee_id
     ORDER BY
-      month ROWS BETWEEN 5 PRECEDING
-      AND UNBOUNDED FOLLOWING
-  ) AS semi_annual_comp
+      month ROWS BETWEEN 11 PRECEDING
+      AND CURRENT ROW
+  ) AS trail_12_m_comp
 FROM
   employees
 </code></pre>
@@ -1422,13 +1430,13 @@ FROM
 <h4 id="prql-46"><a class="header" href="#prql-46">PRQL</a></h4>
 <pre><code class="language-prql">from orders
 sort day
-window rolling:3 (
-  derive [total_last_3_days = sum price]
+window rows:-3..3 (
+  derive [centered_weekly_average = average value]
 )
 group [order_month] (
   sort day
   window expanding:true (
-    derive [monthly_running_total = sum price]
+    derive [monthly_running_total = sum value]
   )
 )
 </code></pre>
@@ -1437,12 +1445,12 @@ group [order_month] (
 <h4 id="sql-46"><a class="header" href="#sql-46">SQL</a></h4>
 <pre><code class="language-sql">SELECT
   orders.*,
-  SUM(price) OVER (
+  AVG(value) OVER (
     ORDER BY
-      day ROWS BETWEEN 2 PRECEDING
-      AND CURRENT ROW
-  ) AS total_last_3_days,
-  SUM(price) OVER (
+      day ROWS BETWEEN 3 PRECEDING
+      AND 3 FOLLOWING
+  ) AS centered_weekly_average,
+  SUM(value) OVER (
     PARTITION BY order_month
     ORDER BY
       day ROWS BETWEEN UNBOUNDED PRECEDING
@@ -1478,12 +1486,11 @@ FROM
 <p>PRQL uses <code>@</code> followed by a string to represent dates &amp; times. This is less
 verbose than SQL’s approach of <code>TIMESTAMP '2004-10-19 10:23:54'</code> and more
 explicit than SQL’s implicit option of just using a string <code>'2004-10-19 10:23:54'</code>.</p>
-<blockquote>
-<p>Currently PRQL passes strings which can be compiled straight through to the
+<pre><code class="language-admonish note">Currently PRQL passes strings which can be compiled straight through to the
 database, and so many compatible formats string may work, but we may refine this
-in the future to aid in compatibility across databases. We’ll always support the
-canonical <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601</a> format described below.</p>
-</blockquote>
+in the future to aid in compatibility across databases. We'll always support the
+canonical [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) format described below.
+</code></pre>
 <h2 id="dates"><a class="header" href="#dates">Dates</a></h2>
 <p>Dates are represented by <code>@{yyyy-mm-dd}</code> — a <code>@</code> followed by the
 date format.</p>
@@ -1547,13 +1554,12 @@ time.</p>
 <h2 id="intervals"><a class="header" href="#intervals">Intervals</a></h2>
 <p>Intervals are represented by <code>{N}{periods}</code>, such as <code>2years</code> or <code>10minutes</code>,
 without a space.</p>
-<blockquote>
-<p>These aren’t the same as ISO8601, because we evaluated <code>P3Y6M4DT12H30M5S</code> to
-be difficult to understand, but we could support a simplified form if there’s
-demand for it. We don’t currently support compound expressions, for example
-<code>2years10months</code>, but most DBs will allow <code>2years + 10months</code>. Please raise an
-issue if this is inconvenient.</p>
-</blockquote>
+<pre><code class="language-admonish note">These aren't the same as ISO8601, because we evaluated `P3Y6M4DT12H30M5S` to
+be difficult to understand, but we could support a simplified form if there's
+demand for it. We don't currently support compound expressions, for example
+`2years10months`, but most DBs will allow `2years + 10months`. Please raise an
+issue if this is inconvenient.
+</code></pre>
 <div class="comparison">
 <div>
 <h4 id="prql-51"><a class="header" href="#prql-51">PRQL</a></h4>
@@ -1638,11 +1644,10 @@ FROM
 </code></pre>
 </div>
 </div>
-<blockquote>
-<p>Note: <code>|</code> is here temporarily, until we finish work on function &amp; pipeline currying.</p>
-</blockquote>
-<hr />
-<p>We are be able to <a href="https://stackoverflow.com/questions/3800551/select-first-row-in-each-group-by-group">select range of rows in each
+<pre><code class="language-admonish note">Note: `|` is required in `( | take 1)` temporarily, until we finish implementing function &amp; pipeline currying.
+</code></pre>
+<h2 id="selecting-from-each-group"><a class="header" href="#selecting-from-each-group">Selecting from each group</a></h2>
+<p>We are be able to <a href="https://stackoverflow.com/questions/3800551/select-first-row-in-each-group-by-group">select a rows from each
 group</a>
 by combining <code>group</code> and <code>sort</code>:</p>
 <div class="comparison">
@@ -1830,7 +1835,7 @@ LIMIT
 </code></pre>
 </div>
 </div>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="s-strings"><a class="header" href="#s-strings">S-Strings</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="s-strings"><a class="header" href="#s-strings">s-strings</a></h1>
 <p>An s-string inserts SQL directly, as an escape hatch when there’s something that PRQL
 doesn’t yet implement. For example, there’s no <code>version()</code> function in SQL that
 returns the Postgres version, so if we want to use that, we use an s-string:</p>
@@ -1892,11 +1897,11 @@ FROM
 </code></pre>
 </div>
 </div>
-<p>For those who have used python, s-strings are similar to python f-strings, but
+<p>For those who have used python, s-strings are similar to python’s f-strings, but
 the result is SQL, rather than a string literal — a python f-string of
 <code>f&quot;average{col}&quot;</code> where <code>col=&quot;salary&quot;</code> would produce <code>&quot;average(salary)&quot;</code>, with
-the quotes.</p>
-<p>S-strings in user code are intended as an escape-hatch for an unimplemented
+the quotes. <code>s&quot;average{col}&quot;</code> produces <code>average(salary)</code>, without quotes.</p>
+<p>s-strings in user code are intended as an escape-hatch for an unimplemented
 feature. If we often need s-strings to express something, that’s a sign we
 should implement it in PRQL or PRQL’s stdlib.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="strings"><a class="header" href="#strings">Strings</a></h1>
@@ -1968,10 +1973,12 @@ use three-or-more quotes, and close with the same number.</p>
 </code></pre>
 </div>
 </div>
-<p>Currently PRQL does not adjust escape characters.</p>
-<p>Currently PRQL allows multiline strings with either a single character or
+<pre><code class="language-admonish note">Currently PRQL does not adjust escape characters.
+</code></pre>
+<pre><code class="language-admonish warning">Currently PRQL allows multiline strings with either a single character or
 multiple character quotes. This may change for strings using a single character
-quote in future versions.</p>
+quote in future versions.
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="examples-10"><a class="header" href="#examples-10">Examples</a></h1>
 <p>These examples are rewritten from other languages such as SQL. They try to express real-world problems in PRQL, covering most of the language features. We are looking for different use-cases of data transformation, be it database queries, semnatic bussiness modeling or data cleaning.</p>
 <p>If you want to help, translate some of your queries to PRQL and <a href="https://github.com/prql/prql/pulls">open a PR</a> to add them here!</p>

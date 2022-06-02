@@ -26,6 +26,7 @@
 
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="../comparison-table.css">
+        <link rel="stylesheet" href="../././mdbook-admonish.css">
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -197,9 +198,8 @@ LIMIT
 </div>
 <p>To find the employee who joined first in each department, it’s exactly the
 same pipeline, but within a <code>group</code> expression:</p>
-<blockquote>
-<p>Not yet implemented, ref <a href="https://github.com/prql/prql/issues/421">https://github.com/prql/prql/issues/421</a></p>
-</blockquote>
+<pre><code class="language-admonish todo">This isn't yet implemented, ref &lt;https://github.com/prql/prql/issues/421&gt;
+</code></pre>
 <pre><code class="language-prql_no_test">from employees
 group role (
   sort join_date  # taken from above

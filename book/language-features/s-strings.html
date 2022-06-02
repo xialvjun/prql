@@ -26,6 +26,7 @@
 
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="../comparison-table.css">
+        <link rel="stylesheet" href="../././mdbook-admonish.css">
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -138,7 +139,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="s-strings"><a class="header" href="#s-strings">S-Strings</a></h1>
+                        <h1 id="s-strings"><a class="header" href="#s-strings">s-strings</a></h1>
 <p>An s-string inserts SQL directly, as an escape hatch when there’s something that PRQL
 doesn’t yet implement. For example, there’s no <code>version()</code> function in SQL that
 returns the Postgres version, so if we want to use that, we use an s-string:</p>
@@ -200,11 +201,11 @@ FROM
 </code></pre>
 </div>
 </div>
-<p>For those who have used python, s-strings are similar to python f-strings, but
+<p>For those who have used python, s-strings are similar to python’s f-strings, but
 the result is SQL, rather than a string literal — a python f-string of
 <code>f&quot;average{col}&quot;</code> where <code>col=&quot;salary&quot;</code> would produce <code>&quot;average(salary)&quot;</code>, with
-the quotes.</p>
-<p>S-strings in user code are intended as an escape-hatch for an unimplemented
+the quotes. <code>s&quot;average{col}&quot;</code> produces <code>average(salary)</code>, without quotes.</p>
+<p>s-strings in user code are intended as an escape-hatch for an unimplemented
 feature. If we often need s-strings to express something, that’s a sign we
 should implement it in PRQL or PRQL’s stdlib.</p>
 

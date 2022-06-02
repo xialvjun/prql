@@ -26,6 +26,7 @@
 
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="../comparison-table.css">
+        <link rel="stylesheet" href="../././mdbook-admonish.css">
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -139,22 +140,30 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="window"><a class="header" href="#window">Window</a></h1>
-<p>Applies a pipeline to overlapping segments of rows.</p>
+<p>Applies a pipeline to segments of rows, producing one output value for every
+input value.</p>
 <pre><code class="language-prql_no_test">window rows:{range} range:{range} expanding:false rolling:0 {pipeline}
 </code></pre>
-<p>For each row in result, its input segment is determined by one of:</p>
+<p>For each row, the segment over which the pipeline is applied is determined by
+one of:</p>
 <ul>
-<li><code>rows</code>, which takes a range of rows relative to the current row.</li>
+<li><code>rows</code>, which takes a range of rows relative to the current row.
+<ul>
+<li><code>0</code> references the current row.</li>
+</ul>
+</li>
 <li><code>range</code>, which takes a range of values relative to current row value.</li>
 </ul>
-<p>Bounds of the range are inclusive. <code>0</code> references current row. If a bound is
-omitted, the segment will extend until the edge of the table or group.</p>
+<p>The bounds of the range are inclusive. If a bound is omitted, the segment will
+extend until the edge of the table or group.</p>
 <!-- TODO: rows vs range example, with visualization -->
 <p>For ease of use, there are two flags that override <code>rows</code> or <code>range</code>:</p>
 <ul>
-<li><code>expanding:true</code> is an alias for <code>rows:..0</code>. Sum using this window is also known as “cumulative sum”.</li>
+<li><code>expanding:true</code> is an alias for <code>rows:..0</code>. A sum using this window is also
+known as “cumulative sum”.</li>
 <li><code>rolling:n</code> is an alias for <code>row:(-n+1)..0</code>, where <code>n</code> is an integer. This
-will include <code>n</code> last values, including current row.</li>
+will include <code>n</code> last values, including current row. An average using this
+window is also knows as a Simple Moving Average.</li>
 </ul>
 <p>Some examples:</p>
 <table><thead><tr><th>Expression</th><th>Meaning</th></tr></thead><tbody>
@@ -174,8 +183,8 @@ will include <code>n</code> last values, including current row.</li>
 <pre><code class="language-prql">from employees
 group employee_id (
   sort month
-  window rows:-5.. (
-    derive [semi_annual_comp = sum paycheck]
+  window rolling:12 (
+    derive [trail_12_m_comp = sum paycheck]
   )
 )
 </code></pre>
@@ -187,9 +196,9 @@ group employee_id (
   SUM(paycheck) OVER (
     PARTITION BY employee_id
     ORDER BY
-      month ROWS BETWEEN 5 PRECEDING
-      AND UNBOUNDED FOLLOWING
-  ) AS semi_annual_comp
+      month ROWS BETWEEN 11 PRECEDING
+      AND CURRENT ROW
+  ) AS trail_12_m_comp
 FROM
   employees
 </code></pre>
@@ -200,13 +209,13 @@ FROM
 <h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
 <pre><code class="language-prql">from orders
 sort day
-window rolling:3 (
-  derive [total_last_3_days = sum price]
+window rows:-3..3 (
+  derive [centered_weekly_average = average value]
 )
 group [order_month] (
   sort day
   window expanding:true (
-    derive [monthly_running_total = sum price]
+    derive [monthly_running_total = sum value]
   )
 )
 </code></pre>
@@ -215,12 +224,12 @@ group [order_month] (
 <h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
 <pre><code class="language-sql">SELECT
   orders.*,
-  SUM(price) OVER (
+  AVG(value) OVER (
     ORDER BY
-      day ROWS BETWEEN 2 PRECEDING
-      AND CURRENT ROW
-  ) AS total_last_3_days,
-  SUM(price) OVER (
+      day ROWS BETWEEN 3 PRECEDING
+      AND 3 FOLLOWING
+  ) AS centered_weekly_average,
+  SUM(value) OVER (
     PARTITION BY order_month
     ORDER BY
       day ROWS BETWEEN UNBOUNDED PRECEDING
