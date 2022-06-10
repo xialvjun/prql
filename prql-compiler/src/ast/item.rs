@@ -347,4 +347,3 @@ fn display_interpolation(
     f.write_char('"')?;
     Ok(())
 }
-

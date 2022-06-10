@@ -34,7 +34,7 @@ pub struct Node {
     pub span: Option<Span>,
     #[serde(skip)]
     pub declared_at: Option<usize>,
-    
+
     /// Type of expression this node represents. [None] means type has not yet been determined.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ty: Option<Ty>,
