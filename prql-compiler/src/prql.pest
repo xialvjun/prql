@@ -79,7 +79,7 @@ term = _{ ( s_string | f_string | range | literal | ident | nested_pipeline | ex
 expr_unary = { ( operator_unary ~ ( nested_pipeline | ident )) }
 literal = _{ interval | number | boolean | null | string | timestamp | date | time }
 list = { "[" ~ (NEWLINE* ~ (assign_call | expr_call) ~ ("," ~ NEWLINE* ~ (assign_call | expr_call) )* ~ ","?)? ~ NEWLINE* ~ "]" }
-nested_pipeline = _{ "(" ~ (WHITESPACE | NEWLINE)* ~ pipeline ~ (WHITESPACE | NEWLINE)* ~ ")" }
+nested_pipeline = { "(" ~ (WHITESPACE | NEWLINE)* ~ pipeline? ~ (WHITESPACE | NEWLINE)* ~ ")" }
 
 // We haven't implemented escapes — I think we can mostly pass those through to
 // SQL, but there may be things we're missing.

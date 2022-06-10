@@ -46,12 +46,12 @@ fn parse_tree_of_str(source: &str, rule: Rule) -> Result<Pairs<Rule>> {
 /// Parses a parse tree of pest Pairs into an AST.
 fn ast_of_parse_pairs(pairs: Pairs<Rule>) -> Result<Vec<Node>> {
     pairs
+        .filter(|p| !matches!(p.as_rule(), Rule::EOI))
         .map(ast_of_parse_pair)
-        .filter_map(|n| n.transpose())
         .collect()
 }
 
-fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Option<Node>> {
+fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Node> {
     let span = pair.as_span();
     let rule = pair.as_rule();
 
@@ -105,14 +105,14 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Option<Node>> {
         Rule::expr_mul | Rule::expr_add | Rule::expr_compare | Rule::expr => {
             let mut pairs = pair.into_inner();
 
-            let mut expr = ast_of_parse_pair(pairs.next().unwrap())?.unwrap();
+            let mut expr = ast_of_parse_pair(pairs.next().unwrap())?;
             if let Some(op) = pairs.next() {
                 let op = BinOp::from_str(op.as_str())?;
 
                 expr = Node::from(Item::Binary {
                     op,
                     left: Box::new(expr),
-                    right: Box::new(ast_of_parse_pair(pairs.next().unwrap())?.unwrap()),
+                    right: Box::new(ast_of_parse_pair(pairs.next().unwrap())?),
                 });
             }
 
@@ -123,7 +123,7 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Option<Node>> {
 
             let op = pairs.next().unwrap();
 
-            let a = ast_of_parse_pair(pairs.next().unwrap())?.unwrap();
+            let a = ast_of_parse_pair(pairs.next().unwrap())?;
             match UnOp::from_str(op.as_str()) {
                 Ok(op) => Item::Unary {
                     op,
@@ -194,7 +194,7 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Option<Node>> {
                 name,
                 positional_params,
                 named_params,
-                body: Box::from(ast_of_parse_pair(body)?.unwrap()),
+                body: Box::from(ast_of_parse_pair(body)?),
                 return_ty: return_type,
             })
         }
@@ -255,9 +255,16 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Option<Node>> {
         Rule::pipeline => {
             let mut nodes = ast_of_parse_pairs(pair.into_inner())?;
             match nodes.len() {
-                0 => return Ok(None),
+                0 => unreachable!(),
                 1 => nodes.remove(0).item,
                 _ => Item::Pipeline(Pipeline { nodes }),
+            }
+        }
+        Rule::nested_pipeline => {
+            if let Some(pipeline) = pair.into_inner().next() {
+                ast_of_parse_pair(pipeline)?.item
+            } else {
+                Item::Pipeline(Pipeline { nodes: vec![] })
             }
         }
         Rule::range => {
@@ -340,8 +347,6 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Option<Node>> {
             Item::Type(typ)
         }
 
-        Rule::EOI => return Ok(None),
-
         _ => unreachable!("{pair}"),
     };
     let mut node = Node::from(item);
@@ -349,16 +354,16 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Option<Node>> {
         start: span.start(),
         end: span.end(),
     });
-    Ok(Some(node))
+    Ok(node)
 }
 
 fn parse_typed(pair: Pair<Rule>) -> Result<(Node, Option<Ty>)> {
     let mut pairs = pair.into_inner();
 
-    let node = ast_of_parse_pair(pairs.next().unwrap())?.unwrap();
+    let node = ast_of_parse_pair(pairs.next().unwrap())?;
 
     let ty = pairs.next();
-    let ty = ty.map(ast_of_parse_pair).transpose()?.flatten();
+    let ty = ty.map(ast_of_parse_pair).transpose()?;
     let ty = ty.map(|t| t.item.into_type()).transpose()?;
     Ok((node, ty))
 }
@@ -380,7 +385,7 @@ fn ast_of_interpolate_items(pair: Pair<Rule>) -> Result<Vec<InterpolateItem>> {
                 // Rule::interpolate_string_inner | Rule::jinja_string_inner => {
                 //     InterpolateItem::String(x.as_str().to_string())
                 // }
-                _ => InterpolateItem::Expr(Box::new(ast_of_parse_pair(x)?.unwrap())),
+                _ => InterpolateItem::Expr(Box::new(ast_of_parse_pair(x)?)),
             })
         })
         .collect::<Result<_>>()
