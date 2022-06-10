@@ -1,6 +1,7 @@
+use std::cmp::Ordering;
 use std::collections::HashMap;
 
-use anyhow::{Context as AnyhowContext, Result};
+use anyhow::{bail, Context as AnyhowContext, Result};
 use itertools::Itertools;
 
 use crate::ast::ast_fold::*;
@@ -74,20 +75,20 @@ impl AstFold for TypeResolver {
                 Literal::Timestamp(_) => TyLit::Timestamp.into(),
             },
 
-            Item::Assign(_) | Item::NamedArg(_) => {
+            Item::Assign(_) | Item::NamedArg(_) | Item::Windowed(_) => {
                 // assume type of inner expr
-
                 node.item = self.fold_item(node.item)?;
 
-                if let Item::Assign(ne) | Item::NamedArg(ne) = &node.item {
-                    ne.expr.ty.clone().unwrap()
-                } else {
-                    unreachable!()
+                match &node.item {
+                    Item::Assign(ne) | Item::NamedArg(ne) => ne.expr.ty.clone().unwrap(),
+                    Item::Windowed(w) => w.expr.ty.clone().unwrap(),
+                    _ => unreachable!(),
                 }
             }
 
             Item::Ident(_) => {
                 // assume type of referenced declaration
+                //dbg!(&node);
 
                 let id = node.declared_at.unwrap();
                 match self.context.declarations.get(id) {
@@ -104,12 +105,8 @@ impl AstFold for TypeResolver {
                         ty
                     }
                     Declaration::ExternRef { .. } => Ty::Literal(TyLit::Column),
-                    Declaration::Function(func_def) => {
-                        let expected = type_of_func_def(func_def);
-
-                        let func_call = FuncCall::default();
-
-                        validate_func_call(&func_call, &expected)?
+                    Declaration::Function(_) => {
+                        unreachable!()
                     }
                     Declaration::Table(_) => Ty::Literal(TyLit::Table),
                 }
@@ -127,19 +124,63 @@ impl AstFold for TypeResolver {
                 let func_def = (self.context.declarations.get(id).as_function())
                     .context("expected function definition?")?;
                 let expected_ty = type_of_func_def(func_def);
+                //dbg!(&expected_ty);
 
                 let res_ty = validate_func_call(&func_call, &expected_ty)?;
+                // println!("{}: {}", &func_call.name, res_ty);
 
                 node.item = Item::FuncCall(func_call);
                 res_ty
             }
 
-            Item::Pipeline(_) => {
+            Item::Pipeline(pipeline) => {
+                let mut value_ty = Ty::Empty;
+                let mut res = Vec::with_capacity(pipeline.nodes.len());
+
+                //dbg!(&pipeline);
+
+                for node in pipeline.nodes {
+                    let (node, node_ty) = self.resolve_type(node)?;
+
+                    value_ty = if let Ty::Empty = value_ty {
+                        node_ty
+                    } else if let Ty::Function(node_func) = node_ty {
+                        if let Ty::Function(mut value_func) = value_ty {
+                            value_func.return_ty =
+                                Box::new(validate_lambda_call(*value_func.return_ty, &node_func)?);
+                            Ty::Function(value_func)
+                        } else {
+                            validate_lambda_call(value_ty, &node_func)?
+                        }
+                    } else {
+                        // throw error: node is not a function
+                        bail!(Error::new(Reason::Simple(
+                                format!("`{}` has type `{node_ty}`, but it is called as a function with argument of type `{value_ty}`", node.item)
+                            )).with_span(node.span))
+                    };
+
+                    //dbg!(&value_ty);
+                    res.push(node);
+                }
+                node.item = Item::Pipeline(Pipeline { nodes: res });
+
+                value_ty
+            }
+
+            Item::Transform(ref t) => {
+                // TODO remove this matching when casting into transforms is moved to happen after type check
+                let ty = match t {
+                    Transform::From(_) => Ty::Literal(TyLit::Table),
+                    _ => Ty::Function(TyFunc {
+                        args: vec![Ty::Literal(TyLit::Table)],
+                        named: HashMap::new(),
+                        return_ty: Box::new(Ty::Literal(TyLit::Table)),
+                    }),
+                };
+
                 node.item = self.fold_item(node.item)?;
 
-                
-
-                Ty::Infer
+                ty
             }
 
             Item::SString(_) => Ty::Infer, // TODO
@@ -166,6 +207,18 @@ impl TypeResolver {
         let ty = node.ty.clone().unwrap();
         Ok((node, ty))
     }
+}
+
+fn validate_lambda_call(arg1: Ty, expected: &TyFunc) -> Result<Ty, Error> {
+    let next_call = FuncCall {
+        args: vec![Node {
+            ty: Some(arg1),
+            ..Item::Empty.into()
+        }],
+        ..Default::default()
+    };
+
+    validate_func_call(&next_call, expected)
 }
 
 fn validate_func_call(call: &FuncCall, expected: &TyFunc) -> Result<Ty, Error> {
@@ -197,9 +250,9 @@ fn validate_func_call(call: &FuncCall, expected: &TyFunc) -> Result<Ty, Error> {
             args: expected.args[passed_len..].to_vec(),
             named: HashMap::new(),
             return_ty: expected.return_ty.clone(),
-        }))
-    } 
-    
+        }));
+    }
+
     if passed_len > expected_len {
         // too many args: try evaluating the return value
         let next_call = FuncCall {
@@ -211,11 +264,11 @@ fn validate_func_call(call: &FuncCall, expected: &TyFunc) -> Result<Ty, Error> {
             validate_func_call(&next_call, next_func)
         } else {
             Err(too_many_arguments(call, expected_len, passed_len))
-        }
+        };
     }
 
     // exactly arg match
-    Ok(*expected.return_ty.clone())    
+    Ok(*expected.return_ty.clone())
 }
 
 fn too_many_arguments(call: &FuncCall, expected_len: usize, passed_len: usize) -> Error {
@@ -243,13 +296,19 @@ where
 
     let infer = matches!(found_ty, Ty::Infer) || matches!(expected, Ty::Infer);
 
-    if !(found_ty <= *expected) && !infer {
-        return Err(Error::new(Reason::Expected {
-            who: who(),
-            expected: format!("type `{}`", expected),
-            found: format!("type `{}`", found_ty),
-        })
-        .with_span(found.span));
+    if !infer {
+        let expected_is_above = matches!(
+            expected.partial_cmp(&found_ty),
+            Some(Ordering::Equal | Ordering::Greater)
+        );
+        if !expected_is_above {
+            return Err(Error::new(Reason::Expected {
+                who: who(),
+                expected: format!("type `{}`", expected),
+                found: format!("type `{}`", found_ty),
+            })
+            .with_span(found.span));
+        }
     }
 
     Ok(if let Ty::Infer = expected {

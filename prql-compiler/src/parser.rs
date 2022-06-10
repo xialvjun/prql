@@ -255,7 +255,7 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Node> {
         Rule::pipeline => {
             let mut nodes = ast_of_parse_pairs(pair.into_inner())?;
             match nodes.len() {
-                0 => unreachable!(),
+                0 => unimplemented!(),
                 1 => nodes.remove(0).item,
                 _ => Item::Pipeline(Pipeline { nodes }),
             }
@@ -264,7 +264,7 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Node> {
             if let Some(pipeline) = pair.into_inner().next() {
                 ast_of_parse_pair(pipeline)?.item
             } else {
-                Item::Pipeline(Pipeline { nodes: vec![] })
+                Item::Empty
             }
         }
         Rule::range => {
@@ -313,8 +313,8 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Node> {
                 .into_inner()
                 .into_iter()
                 .map(|pair| -> Result<Ty> {
-                    let mut parts: Vec<_> = pair.into_inner().into_iter().collect();
-                    let name = &parts.remove(0).as_str();
+                    let mut pairs = pair.into_inner();
+                    let name = pairs.next().unwrap().as_str();
                     let typ = match TyLit::from_str(name) {
                         Ok(t) => Ty::from(t),
                         Err(_) => {
@@ -323,12 +323,7 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Node> {
                         }
                     };
 
-                    let param = parts
-                        .pop()
-                        .map(|p| ast_of_parse_pairs(p.into_inner()))
-                        .transpose()?
-                        .map(|p| p.into_only())
-                        .transpose()?;
+                    let param = pairs.next().map(ast_of_parse_pair).transpose()?;
 
                     Ok(if let Some(param) = param {
                         Ty::Parameterized(Box::new(typ), Box::new(param))

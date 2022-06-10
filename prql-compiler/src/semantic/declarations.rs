@@ -47,9 +47,7 @@ impl Declarations {
 
         let dummy = Node::from(Item::Literal(Literal::Null));
         let dummy = Declaration::Expression(Box::new(dummy));
-        let node = std::mem::replace(decl, dummy);
-
-        node
+        std::mem::replace(decl, dummy)
     }
 }
 

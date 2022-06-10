@@ -8,6 +8,7 @@ use super::Node;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Ty {
+    Empty,
     Literal(TyLit),
     Named(String),
     Parameterized(Box<Ty>, Box<Node>),
@@ -89,13 +90,6 @@ impl PartialOrd for Ty {
                     None
                 }
             }
-            (Ty::Parameterized(l_ty, l_param), Ty::Parameterized(r_ty, r_param)) => {
-                if l_ty == r_ty && l_param == r_param {
-                    Some(Ordering::Equal)
-                } else {
-                    None
-                }
-            }
             (Ty::AnyOf(many), one) => {
                 if many.iter().any(|m| m >= one) {
                     Some(Ordering::Greater)
@@ -110,6 +104,27 @@ impl PartialOrd for Ty {
                     None
                 }
             }
+            (Ty::Parameterized(l_ty, l_param), Ty::Parameterized(r_ty, r_param)) => {
+                if l_ty == r_ty && l_param.item.as_type() == r_param.item.as_type() {
+                    Some(Ordering::Equal)
+                } else {
+                    None
+                }
+            }
+            (Ty::Parameterized(l_ty, _), r_ty) => {
+                if **l_ty == *r_ty {
+                    Some(Ordering::Equal)
+                } else {
+                    None
+                }
+            }
+            (l_ty, Ty::Parameterized(r_ty, _)) => {
+                if *l_ty == **r_ty {
+                    Some(Ordering::Equal)
+                } else {
+                    None
+                }
+            }
             _ => None,
         }
     }
@@ -118,10 +133,11 @@ impl PartialOrd for Ty {
 impl Display for Ty {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         match &self {
+            Ty::Empty => write!(f, "()"),
             Ty::Literal(lit) => write!(f, "{:}", lit),
             Ty::Named(name) => write!(f, "{:}", name),
             Ty::Parameterized(t, param) => {
-                write!(f, "{t}<{:?}>", param.item)
+                write!(f, "{t}<{}>", param.item.as_type().unwrap())
             }
             Ty::AnyOf(ts) => {
                 for (i, t) in ts.iter().enumerate() {

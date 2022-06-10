@@ -120,9 +120,8 @@ pub fn fold_item<T: ?Sized + AstFold>(fold: &mut T, item: Item) -> Result<Item> 
         Item::Table(table) => Item::Table(fold.fold_table(table)?),
         Item::Windowed(window) => Item::Windowed(fold.fold_windowed(window)?),
         Item::Type(t) => Item::Type(fold.fold_type(t)?),
-        // None of these capture variables, so we don't need to replace
-        // them.
-        Item::Literal(_) | Item::Interval(_) => item,
+        // None of these capture variables, so we don't need to fold them.
+        Item::Empty | Item::Literal(_) | Item::Interval(_) => item,
     })
 }
 

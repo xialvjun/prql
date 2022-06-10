@@ -328,7 +328,7 @@ impl NameResolver {
             let func_call = Item::FuncCall(self.fold_func_call(func_call)?);
 
             // wrap into windowed
-            if !self.within_aggregate && Some(Ty::column()) <= return_type {
+            if Some(Ty::column()) <= return_type && !self.within_aggregate {
                 node.item = self.wrap_into_windowed(func_call, node.declared_at);
                 node.declared_at = None;
             } else {

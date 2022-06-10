@@ -40,6 +40,8 @@ impl Scope {
 
     /// Removes all names from scope, except functions and columns in frame.
     pub(super) fn clear(&mut self) {
+        // TODO this function does not work properly
+
         let mut to_remove = HashSet::<usize>::new();
         self.variables.retain(|name, decls| {
             let remove = name.starts_with(NS_PARAM) || name.ends_with(".*") || name == "*";

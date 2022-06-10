@@ -10,6 +10,7 @@ use super::*;
 
 #[derive(Debug, EnumAsInner, PartialEq, Clone, Serialize, Deserialize)]
 pub enum Item {
+    Empty,
     Ident(Ident),
     Literal(Literal),
     Assign(NamedExpr),
@@ -205,6 +206,9 @@ impl From<Item> for anyhow::Error {
 impl Display for Item {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Item::Empty => {
+                f.write_str("()")?;
+            }
             Item::Ident(s) => {
                 f.write_str(s)?;
             }
