@@ -44,28 +44,22 @@ impl Context {
         self.scope.add(var_name, table_id);
     }
 
-    pub fn declare_func_param(&mut self, node: &Node) -> usize {
+    pub fn declare_func_param(&mut self, node: &Node, ty: &Option<Ty>) -> usize {
         let name = match &node.item {
             Item::Ident(ident) => ident.clone(),
             Item::NamedArg(NamedExpr { name, .. }) => name.clone(),
             _ => unreachable!(),
         };
 
-        // doesn't matter, will get overridden anyway
-        let decl = Box::new(Item::Ident("".to_string()).into());
+        // value doesn't matter, it will get overridden anyway
+        let mut decl: Node = Item::Literal(Literal::Null).into();
+        decl.ty = ty.clone();
 
-        let id = self.declare(Declaration::Expression(decl), None);
+        let id = self.declare(Declaration::Expression(Box::new(decl)), None);
 
         self.scope.add(format!("{NS_PARAM}.{name}"), id);
 
         id
-    }
-}
-
-impl From<Declaration> for anyhow::Error {
-    fn from(dec: Declaration) -> Self {
-        // panic!("Unexpected declaration type: {dec:?}");
-        anyhow::anyhow!("Unexpected declaration type: {dec:?}")
     }
 }
 

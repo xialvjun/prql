@@ -272,7 +272,7 @@ pub fn fold_func_def<T: ?Sized + AstFold>(fold: &mut T, func_def: FuncDef) -> Re
         positional_params: fold_typed_nodes(fold, func_def.positional_params)?,
         named_params: fold_typed_nodes(fold, func_def.named_params)?,
         body: Box::new(fold.fold_node(*func_def.body)?),
-        return_type: func_def.return_type,
+        return_ty: func_def.return_ty,
     })
 }
 

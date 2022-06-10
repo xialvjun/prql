@@ -445,7 +445,7 @@ take 20
                 - Expr:
                     Ident: x
                 - String: )
-            return_type: ~
+            return_ty: ~
         - Pipeline:
             nodes:
               - FuncCall:

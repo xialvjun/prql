@@ -4,7 +4,7 @@ use anyhow::{bail, Result};
 use itertools::Itertools;
 
 use crate::ast::ast_fold::*;
-use crate::error::{Error, Reason, Span, WithErrorInfo};
+use crate::error::{Error, Reason, Span};
 use crate::{ast::*, split_var_name, Declaration};
 
 use super::complexity::determine_complexity;
@@ -63,11 +63,11 @@ impl AstFold for NameResolver {
                 Ok(match node.item {
                     Item::FuncDef(mut func_def) => {
                         // declare variables
-                        for (param, _) in &mut func_def.named_params {
-                            param.declared_at = Some(self.context.declare_func_param(param));
+                        for (param, ty) in &mut func_def.named_params {
+                            param.declared_at = Some(self.context.declare_func_param(param, ty));
                         }
-                        for (param, _) in &mut func_def.positional_params {
-                            param.declared_at = Some(self.context.declare_func_param(param));
+                        for (param, ty) in &mut func_def.positional_params {
+                            param.declared_at = Some(self.context.declare_func_param(param, ty));
                         }
 
                         // fold body
@@ -314,13 +314,12 @@ impl NameResolver {
     fn fold_function_call(&mut self, mut node: Node) -> Result<Node> {
         let func_call = node.item.into_func_call().unwrap();
 
-        // validate
-        let (func_call, func_def) = self
-            .validate_function_call(node.declared_at, func_call)
-            .with_span(node.span)?;
+        let func_dec = node.declared_at.unwrap();
+        let func_dec = self.context.declarations.get(func_dec);
+        let func_def = func_dec.as_function().unwrap();
 
-        let return_type = func_def.return_type.as_ref();
-        if Some(&Ty::frame()) <= return_type {
+        let return_type = func_def.return_ty.clone();
+        if Some(Ty::frame()) <= return_type {
             // cast if this is a transform
             let transform = transforms::cast_transform(func_call, node.span)?;
 
@@ -329,7 +328,7 @@ impl NameResolver {
             let func_call = Item::FuncCall(self.fold_func_call(func_call)?);
 
             // wrap into windowed
-            if !self.within_aggregate && Some(&Ty::column()) <= return_type {
+            if !self.within_aggregate && Some(Ty::column()) <= return_type {
                 node.item = self.wrap_into_windowed(func_call, node.declared_at);
                 node.declared_at = None;
             } else {
@@ -420,67 +419,6 @@ impl NameResolver {
             ))))
         }
         Ok(())
-    }
-
-    fn validate_function_call(
-        &self,
-        declared_at: Option<usize>,
-        mut func_call: FuncCall,
-    ) -> Result<(FuncCall, FuncDef), Error> {
-        if declared_at.is_none() {
-            return Err(Error::new(Reason::NotFound {
-                name: func_call.name,
-                namespace: "function".to_string(),
-            }));
-        }
-
-        let func_dec = declared_at.unwrap();
-        let func_dec = &self.context.declarations.0[func_dec].0;
-        let func_def = func_dec.as_function().unwrap().clone();
-
-        // extract needed named args from positionals
-        let named_params: HashSet<_> = (func_def.named_params)
-            .iter()
-            .map(|param| &param.0.item.as_named_arg().unwrap().name)
-            .collect();
-        let (named, positional) = func_call
-            .args
-            .into_iter()
-            .partition(|arg| matches!(&arg.item, Item::NamedArg(_)));
-        func_call.args = positional;
-
-        for node in named {
-            let arg = node.item.into_named_arg().unwrap();
-            if !named_params.contains(&arg.name) {
-                return Err(Error::new(Reason::Unexpected {
-                    found: format!("argument named `{}`", arg.name),
-                })
-                .with_span(node.span));
-            }
-            func_call.named_args.insert(arg.name, arg.expr);
-        }
-
-        // validate number of parameters
-        let expected_len = func_def.positional_params.len();
-        let passed_len = func_call.args.len();
-        if expected_len < passed_len {
-            let mut err = Error::new(Reason::Expected {
-                who: Some(func_call.name.clone()),
-                expected: format!("{} arguments", expected_len),
-                found: format!("{}", passed_len),
-            });
-
-            if passed_len > expected_len && passed_len >= 2 {
-                err = err.with_help(format!(
-                    "If you are calling a function, you may want to add parentheses `{} [{:?} {:?}]`",
-                    func_call.name, func_call.args[0], func_call.args[1]
-                ));
-            }
-
-            return Err(err);
-        }
-
-        Ok((func_call, func_def))
     }
 
     pub fn lookup_variable(&mut self, ident: &str, span: Option<Span>) -> Result<usize, String> {

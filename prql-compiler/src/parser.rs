@@ -195,18 +195,28 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Option<Node>> {
                 positional_params,
                 named_params,
                 body: Box::from(ast_of_parse_pair(body)?.unwrap()),
-                return_type,
+                return_ty: return_type,
             })
         }
         Rule::func_call => {
-            let mut items = ast_of_parse_pairs(pair.into_inner())?;
+            let mut nodes = ast_of_parse_pairs(pair.into_inner())?;
 
-            let name = items.remove(0).item.into_ident()?;
+            let name = nodes.remove(0).item.into_ident()?;
+
+            let mut named = HashMap::new();
+            let mut positional = Vec::new();
+            for node in nodes {
+                if let Item::NamedArg(ne) = node.item {
+                    named.insert(ne.name, ne.expr);
+                } else {
+                    positional.push(node);
+                }
+            }
 
             Item::FuncCall(FuncCall {
                 name,
-                args: items,
-                named_args: HashMap::new(),
+                args: positional,
+                named_args: named,
             })
         }
         Rule::table => {
@@ -1022,7 +1032,7 @@ take 20
               right:
                 Literal:
                   Integer: 1
-          return_type: ~
+          return_ty: ~
         "###);
         assert_yaml_snapshot!(ast_of_string(
             "func identity x ->  x", Rule::func_def
@@ -1037,7 +1047,7 @@ take 20
           named_params: []
           body:
             Ident: x
-          return_type: ~
+          return_ty: ~
         "###);
         assert_yaml_snapshot!(ast_of_string(
             "func plus_one x ->  (x + 1)", Rule::func_def
@@ -1058,7 +1068,7 @@ take 20
               right:
                 Literal:
                   Integer: 1
-          return_type: ~
+          return_ty: ~
         "###);
         assert_yaml_snapshot!(ast_of_string(
             "func plus_one x ->  x + 1", Rule::func_def
@@ -1079,7 +1089,7 @@ take 20
               right:
                 Literal:
                   Integer: 1
-          return_type: ~
+          return_ty: ~
         "###);
         // An example to show that we can't delayer the tree, despite there
         // being lots of layers.
@@ -1106,7 +1116,7 @@ take 20
                       Literal:
                         Integer: 1
               named_args: {}
-          return_type: ~
+          return_ty: ~
         "###);
 
         assert_yaml_snapshot!(ast_of_string("func return_constant ->  42", Rule::func_def)?, @r###"
@@ -1118,7 +1128,7 @@ take 20
           body:
             Literal:
               Integer: 42
-          return_type: ~
+          return_ty: ~
         "###);
         assert_yaml_snapshot!(ast_of_string(r#"func count X ->  s"SUM({X})""#, Rule::func_def)?, @r###"
         ---
@@ -1134,7 +1144,7 @@ take 20
               - Expr:
                   Ident: X
               - String: )
-          return_type: ~
+          return_ty: ~
         "###);
 
         /* TODO: Does not yet parse because `window` not yet implemented.
@@ -1174,7 +1184,7 @@ take 20
               op: Add
               right:
                 Ident: to
-          return_type: ~
+          return_ty: ~
         "###);
 
         Ok(())
@@ -1377,7 +1387,7 @@ take 20
                             - Literal:
                                 Integer: 50
                           named_args: {}
-                return_type: ~
+                return_ty: ~
         "###);
     }
 

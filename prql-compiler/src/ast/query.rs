@@ -18,7 +18,7 @@ pub struct FuncDef {
     pub positional_params: Vec<(Node, Option<Ty>)>, // ident
     pub named_params: Vec<(Node, Option<Ty>)>,      // named expr
     pub body: Box<Node>,
-    pub return_type: Option<Ty>,
+    pub return_ty: Option<Ty>,
 }
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]

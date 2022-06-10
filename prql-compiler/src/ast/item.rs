@@ -85,7 +85,7 @@ pub struct ListItem(pub Node);
 ///
 /// Note that `named_args` cannot be determined during parsing, but only during resolving.
 /// Until then, they are stored in args as named expression.
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct FuncCall {
     pub name: Ident,
     pub args: Vec<Node>,
@@ -316,7 +316,7 @@ impl Display for Item {
             }
             Item::Type(typ) => {
                 f.write_char('<')?;
-                display_type(f, typ)?;
+                write!(f, "{typ}")?;
                 f.write_char('>')?;
             }
             Item::Literal(literal) => {
@@ -344,23 +344,3 @@ fn display_interpolation(
     Ok(())
 }
 
-fn display_type(f: &mut std::fmt::Formatter, typ: &Ty) -> Result<(), std::fmt::Error> {
-    match typ {
-        Ty::Literal(lit) => write!(f, "{:}", lit)?,
-        Ty::Named(name) => write!(f, "{:}", name)?,
-        Ty::Parameterized(t, param) => {
-            display_type(f, t)?;
-            write!(f, "<{:?}>", param.item)?
-        }
-        Ty::AnyOf(ts) => {
-            for (i, t) in ts.iter().enumerate() {
-                display_type(f, t)?;
-                if i < ts.len() - 1 {
-                    f.write_char('|')?;
-                }
-            }
-        }
-        Ty::Infer => {}
-    }
-    Ok(())
-}
