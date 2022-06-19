@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::collections::HashMap;
 
-use anyhow::{bail, Context as AnyhowContext, Result};
+use anyhow::{bail, Result};
 use itertools::Itertools;
 
 use crate::ast::ast_fold::*;
@@ -68,27 +68,30 @@ impl AstFold for TypeResolver {
                 Literal::Null => Ty::Infer,
                 Literal::Integer(_) => TyLit::Integer.into(),
                 Literal::Float(_) => TyLit::Float.into(),
-                Literal::Boolean(_) => TyLit::Boolean.into(),
+                Literal::Boolean(_) => TyLit::Bool.into(),
                 Literal::String(_) => TyLit::String.into(),
                 Literal::Date(_) => TyLit::Date.into(),
                 Literal::Time(_) => TyLit::Time.into(),
                 Literal::Timestamp(_) => TyLit::Timestamp.into(),
             },
 
-            Item::Assign(_) | Item::NamedArg(_) | Item::Windowed(_) => {
+            Item::Assign(_) => Ty::Assigns,
+
+            Item::NamedArg(_) | Item::Windowed(_) => {
                 // assume type of inner expr
                 node.item = self.fold_item(node.item)?;
 
                 match &node.item {
-                    Item::Assign(ne) | Item::NamedArg(ne) => ne.expr.ty.clone().unwrap(),
+                    Item::NamedArg(ne) => ne.expr.ty.clone().unwrap(),
                     Item::Windowed(w) => w.expr.ty.clone().unwrap(),
                     _ => unreachable!(),
                 }
             }
 
-            Item::Ident(_) => {
+            Item::Ident(_) if node.declared_at.is_none() => Ty::Unresolved,
+
+            Item::Ident(_) if node.declared_at.is_some() => {
                 // assume type of referenced declaration
-                //dbg!(&node);
 
                 let id = node.declared_at.unwrap();
                 match self.context.declarations.get(id) {
@@ -120,9 +123,7 @@ impl AstFold for TypeResolver {
                     .map(|(name, node)| self.fold_node(*node).map(|n| (name, Box::new(n))))
                     .try_collect()?;
 
-                let id = node.declared_at.unwrap();
-                let func_def = (self.context.declarations.get(id).as_function())
-                    .context("expected function definition?")?;
+                let func_def = self.context.declarations.get_func(node.declared_at)?;
                 let expected_ty = type_of_func_def(func_def);
                 //dbg!(&expected_ty);
 
@@ -294,28 +295,27 @@ where
 {
     let found_ty = found.ty.clone().unwrap();
 
-    let infer = matches!(found_ty, Ty::Infer) || matches!(expected, Ty::Infer);
-
-    if !infer {
-        let expected_is_above = matches!(
-            expected.partial_cmp(&found_ty),
-            Some(Ordering::Equal | Ordering::Greater)
-        );
-        if !expected_is_above {
-            return Err(Error::new(Reason::Expected {
-                who: who(),
-                expected: format!("type `{}`", expected),
-                found: format!("type `{}`", found_ty),
-            })
-            .with_span(found.span));
-        }
+    // infer
+    if let Ty::Infer = expected {
+        return Ok(found_ty);
+    }
+    if let Ty::Infer = found_ty {
+        return Ok(expected.clone());
     }
 
-    Ok(if let Ty::Infer = expected {
-        found_ty
-    } else {
-        expected.clone()
-    })
+    let expected_is_above = matches!(
+        expected.partial_cmp(&found_ty),
+        Some(Ordering::Equal | Ordering::Greater)
+    );
+    if !expected_is_above {
+        return Err(Error::new(Reason::Expected {
+            who: who(),
+            expected: format!("type `{}`", expected),
+            found: format!("type `{}`", found_ty),
+        })
+        .with_span(found.span));
+    }
+    Ok(expected.clone())
 }
 
 fn type_of_func_def(def: &FuncDef) -> TyFunc {
@@ -323,17 +323,12 @@ fn type_of_func_def(def: &FuncDef) -> TyFunc {
         args: def
             .positional_params
             .iter()
-            .map(|a| a.1.clone().unwrap_or(Ty::Infer))
+            .map(|a| a.ty.clone().unwrap_or(Ty::Infer))
             .collect(),
         named: def
             .named_params
             .iter()
-            .map(|a| {
-                (
-                    a.0.item.as_named_arg().unwrap().name.clone(),
-                    a.1.clone().unwrap_or(Ty::Infer),
-                )
-            })
+            .map(|a| (a.name.clone(), a.ty.clone().unwrap_or(Ty::Infer)))
             .collect(),
         return_ty: Box::new(def.return_ty.clone().unwrap_or(Ty::Infer)),
     }

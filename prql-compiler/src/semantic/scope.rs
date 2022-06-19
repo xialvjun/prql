@@ -1,5 +1,9 @@
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    fmt::Debug,
+};
 
+use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
 pub const NS_PARAM: &str = "_param";
@@ -60,4 +64,14 @@ impl Scope {
 /// Splits ident into namespaces and variable name
 pub fn split_var_name(ident: &str) -> (&str, &str) {
     ident.rsplit_once('.').unwrap_or(("", ident))
+}
+
+impl Debug for Scope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let variables: Vec<_> = self.variables.iter().sorted_by_key(|k| k.0).collect();
+        for (name, ids) in variables {
+            writeln!(f, "{name:+20}: {ids:?}")?;
+        }
+        Ok(())
+    }
 }

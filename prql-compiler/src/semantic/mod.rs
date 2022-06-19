@@ -22,5 +22,9 @@ pub use type_resolver::resolve_types;
 ///
 /// Note that this removes function declarations from AST and saves them as current context.
 pub fn resolve(nodes: Vec<Node>, context: Option<Context>) -> anyhow::Result<(Vec<Node>, Context)> {
-    resolve_names(nodes, context).and_then(|(n, c)| resolve_types(n, c))
+    let (nodes, context) = resolve_names(nodes, context)?;
+    let (nodes, context) = resolve_types(nodes, context)?;
+    let nodes = transforms::construct_transforms(nodes, &context)?;
+    let nodes = complexity::determine_complexity(nodes, &context);
+    Ok((nodes, context))
 }

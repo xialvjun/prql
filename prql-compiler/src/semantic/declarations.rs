@@ -1,3 +1,4 @@
+use anyhow::{Context, Result};
 use enum_as_inner::EnumAsInner;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
@@ -25,6 +26,12 @@ pub struct Declarations(pub Vec<(Declaration, Option<Span>)>);
 impl Declarations {
     pub fn get(&self, id: usize) -> &Declaration {
         &self.0[id].0
+    }
+
+    pub fn get_func(&self, id: Option<usize>) -> Result<&FuncDef> {
+        let id = id.context("unresolved function def?")?;
+        let (decl, _span) = &self.0[id];
+        decl.as_function().context("expected function definition?")
     }
 
     pub fn push(&mut self, dec: Declaration, span: Option<Span>) -> usize {

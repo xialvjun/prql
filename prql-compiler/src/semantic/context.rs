@@ -18,8 +18,7 @@ pub struct Context {
 
 impl Context {
     pub fn declare(&mut self, dec: Declaration, span: Option<Span>) -> usize {
-        self.declarations.0.push((dec, span));
-        self.declarations.0.len() - 1
+        self.declarations.push(dec, span)
     }
 
     pub fn declare_func(&mut self, func_def: FuncDef) -> usize {
@@ -33,27 +32,22 @@ impl Context {
         id
     }
 
-    pub fn declare_table(&mut self, t: &mut TableRef) {
-        let name = t.alias.clone().unwrap_or_else(|| t.name.clone());
-        let decl = Declaration::Table(name.clone());
+    pub fn declare_table(&mut self, name: Ident, alias: Option<String>) -> usize {
+        let alias = alias.unwrap_or_else(|| name.clone());
 
-        let table_id = self.declare(decl, None);
-        t.declared_at = Some(table_id);
+        let table_id = self.declare(Declaration::Table(alias.clone()), None);
 
-        let var_name = format!("{name}.*");
+        let var_name = format!("{alias}.*");
         self.scope.add(var_name, table_id);
+        table_id
     }
 
-    pub fn declare_func_param(&mut self, node: &Node, ty: &Option<Ty>) -> usize {
-        let name = match &node.item {
-            Item::Ident(ident) => ident.clone(),
-            Item::NamedArg(NamedExpr { name, .. }) => name.clone(),
-            _ => unreachable!(),
-        };
+    pub fn declare_func_param(&mut self, param: &FuncParam) -> usize {
+        let name = param.name.clone();
 
         // value doesn't matter, it will get overridden anyway
         let mut decl: Node = Item::Literal(Literal::Null).into();
-        decl.ty = ty.clone();
+        decl.ty = param.ty.clone();
 
         let id = self.declare(Declaration::Expression(Box::new(decl)), None);
 
@@ -65,6 +59,7 @@ impl Context {
 
 impl Debug for Context {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "{:?}", self.declarations)
+        writeln!(f, "{:?}", self.declarations)?;
+        writeln!(f, "{:?}", self.scope)
     }
 }

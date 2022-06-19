@@ -18,6 +18,15 @@ pub enum Ty {
     /// Means that we have no information about the type of the variable and
     /// that it should be inferred from other usages.
     Infer,
+
+    /// Means this variable does not have a type - and cannot be initilized.
+    /// It is used for passing keywords to functions (i.e. `join side:left`).
+    /// This could be replaced with globally defined enums.
+    Unresolved,
+
+    /// Type of the column assign operation.
+    /// Has parameter that can be either `table` or `column`.
+    Assigns,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, strum::EnumString, strum::Display)]
@@ -32,8 +41,8 @@ pub enum TyLit {
     Integer,
     #[strum(to_string = "float")]
     Float,
-    #[strum(to_string = "boolean")]
-    Boolean,
+    #[strum(to_string = "bool")]
+    Bool,
     #[strum(to_string = "string")]
     String,
     #[strum(to_string = "date")]
@@ -53,7 +62,7 @@ pub struct TyFunc {
 }
 
 impl Ty {
-    pub const fn frame() -> Ty {
+    pub const fn table() -> Ty {
         Ty::Literal(TyLit::Table)
     }
 
@@ -111,21 +120,26 @@ impl PartialOrd for Ty {
                     None
                 }
             }
-            (Ty::Parameterized(l_ty, _), r_ty) => {
-                if **l_ty == *r_ty {
+            (Ty::Parameterized(l_ty, _), r_ty) if **l_ty == *r_ty => Some(Ordering::Equal),
+            (l_ty, Ty::Parameterized(r_ty, _)) if *l_ty == **r_ty => Some(Ordering::Equal),
+
+            // (assigns<A> < B) iff (A < B)
+            (Ty::Parameterized(assigns, l), r) if matches!(**assigns, Ty::Assigns) => {
+                let l = l.item.as_type().unwrap();
+                l.partial_cmp(r)
+            }
+            (l, Ty::Parameterized(assigns, r)) if matches!(**assigns, Ty::Assigns) => {
+                let r = r.item.as_type().unwrap();
+                l.partial_cmp(r)
+            }
+
+            (l, r) => {
+                if l == r {
                     Some(Ordering::Equal)
                 } else {
                     None
                 }
             }
-            (l_ty, Ty::Parameterized(r_ty, _)) => {
-                if *l_ty == **r_ty {
-                    Some(Ordering::Equal)
-                } else {
-                    None
-                }
-            }
-            _ => None,
         }
     }
 }
@@ -149,6 +163,8 @@ impl Display for Ty {
                 Ok(())
             }
             Ty::Infer => write!(f, "any"),
+            Ty::Unresolved => write!(f, "unresolved"),
+            Ty::Assigns => write!(f, "assigns"),
             Ty::Function(func) => {
                 write!(f, "func")?;
 

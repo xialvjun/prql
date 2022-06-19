@@ -170,8 +170,7 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Node> {
             let params = pairs.next().unwrap();
             let body = pairs.next().unwrap();
 
-            let (name, return_type) = parse_typed(name)?;
-            let name = name.item.into_ident()?;
+            let (name, return_type, _) = parse_typed(name)?;
 
             let params: Vec<_> = params
                 .into_inner()
@@ -179,16 +178,21 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Node> {
                 .map(parse_typed)
                 .try_collect()?;
 
-            let positional_params = params
-                .iter()
-                .filter(|x| matches!(x.0.item, Item::Ident(_)))
-                .cloned()
-                .collect();
-            let named_params = params
-                .iter()
-                .filter(|x| matches!(x.0.item, Item::NamedArg(_)))
-                .cloned()
-                .collect();
+            let mut positional_params = vec![];
+            let mut named_params = vec![];
+            for (name, ty, default_value) in params {
+                let param = FuncParam {
+                    name,
+                    ty,
+                    default_value,
+                    declared_at: None,
+                };
+                if param.default_value.is_some() {
+                    named_params.push(param)
+                } else {
+                    positional_params.push(param)
+                }
+            }
 
             Item::FuncDef(FuncDef {
                 name,
@@ -317,6 +321,8 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Node> {
                     let name = pairs.next().unwrap().as_str();
                     let typ = match TyLit::from_str(name) {
                         Ok(t) => Ty::from(t),
+                        Err(_) if name == "unresolved" => Ty::Unresolved,
+                        Err(_) if name == "assigns" => Ty::Assigns,
                         Err(_) => {
                             eprintln!("named type: {}", name);
                             Ty::Named(name.to_string())
@@ -352,15 +358,25 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Node> {
     Ok(node)
 }
 
-fn parse_typed(pair: Pair<Rule>) -> Result<(Node, Option<Ty>)> {
+fn parse_typed(pair: Pair<Rule>) -> Result<(String, Option<Ty>, Option<Node>)> {
     let mut pairs = pair.into_inner();
 
-    let node = ast_of_parse_pair(pairs.next().unwrap())?;
+    let name = pairs.next().unwrap().as_str().to_string();
 
-    let ty = pairs.next();
-    let ty = ty.map(ast_of_parse_pair).transpose()?;
-    let ty = ty.map(|t| t.item.into_type()).transpose()?;
-    Ok((node, ty))
+    let nodes: Vec<_> = pairs.map(ast_of_parse_pair).try_collect()?;
+
+    let mut ty = None;
+    let mut default = None;
+
+    for node in nodes {
+        if let Item::Type(t) = node.item {
+            ty = Some(t);
+        } else {
+            default = Some(node);
+        }
+    }
+
+    Ok((name, ty, default))
 }
 
 fn named_expr_of_nodes(items: &mut Vec<Node>) -> Result<NamedExpr, anyhow::Error> {
@@ -1021,8 +1037,8 @@ take 20
         FuncDef:
           name: plus_one
           positional_params:
-            - - Ident: x
-              - ~
+            - name: x
+              default_value: ~
           named_params: []
           body:
             Binary:
@@ -1042,8 +1058,8 @@ take 20
         FuncDef:
           name: identity
           positional_params:
-            - - Ident: x
-              - ~
+            - name: x
+              default_value: ~
           named_params: []
           body:
             Ident: x
@@ -1057,8 +1073,8 @@ take 20
         FuncDef:
           name: plus_one
           positional_params:
-            - - Ident: x
-              - ~
+            - name: x
+              default_value: ~
           named_params: []
           body:
             Binary:
@@ -1078,8 +1094,8 @@ take 20
         FuncDef:
           name: plus_one
           positional_params:
-            - - Ident: x
-              - ~
+            - name: x
+              default_value: ~
           named_params: []
           body:
             Binary:
@@ -1101,8 +1117,8 @@ take 20
         FuncDef:
           name: foo
           positional_params:
-            - - Ident: x
-              - ~
+            - name: x
+              default_value: ~
           named_params: []
           body:
             FuncCall:
@@ -1135,8 +1151,8 @@ take 20
         FuncDef:
           name: count
           positional_params:
-            - - Ident: X
-              - ~
+            - name: X
+              default_value: ~
           named_params: []
           body:
             SString:
@@ -1169,14 +1185,12 @@ take 20
         FuncDef:
           name: add
           positional_params:
-            - - Ident: x
-              - ~
+            - name: x
+              default_value: ~
           named_params:
-            - - NamedArg:
-                  name: to
-                  expr:
-                    Ident: a
-              - ~
+            - name: to
+              default_value:
+                Ident: a
           body:
             Binary:
               left:
@@ -1374,8 +1388,8 @@ take 20
             - FuncDef:
                 name: median
                 positional_params:
-                  - - Ident: x
-                    - ~
+                  - name: x
+                    default_value: ~
                 named_params: []
                 body:
                   Pipeline:

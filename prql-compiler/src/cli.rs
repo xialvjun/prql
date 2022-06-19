@@ -122,8 +122,8 @@ fn compile_to(format: Format, source: &str) -> Result<Vec<u8>, Error> {
 
             // resolve
             let std_lib = load_std_lib()?;
-            let (_, context) = semantic::resolve_names(std_lib, None)?;
-            let (nodes, context) = semantic::resolve_names(query.nodes, Some(context))?;
+            let (_, context) = semantic::resolve(std_lib, None)?;
+            let (nodes, context) = semantic::resolve(query.nodes, Some(context))?;
 
             let frames = semantic::collect_frames(nodes);
 

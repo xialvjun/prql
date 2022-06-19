@@ -93,6 +93,15 @@ pub struct FuncCall {
     pub named_args: HashMap<Ident, Box<Node>>,
 }
 
+impl FuncCall {
+    pub fn without_args(name: Ident) -> Self {
+        FuncCall {
+            name,
+            ..Default::default()
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Windowed {
     pub expr: Box<Node>,
@@ -257,10 +266,10 @@ impl Display for Item {
             Item::FuncDef(func_def) => {
                 write!(f, "func {}", func_def.name)?;
                 for arg in &func_def.positional_params {
-                    write!(f, " {}", arg.0.item)?;
+                    write!(f, " {}", arg.name)?;
                 }
                 for arg in &func_def.named_params {
-                    write!(f, " {}", arg.0.item)?;
+                    write!(f, " {}", arg.name)?;
                 }
                 write!(f, " = {}\n\n", func_def.body.item)?;
             }
@@ -324,7 +333,7 @@ impl Display for Item {
                 f.write_char('>')?;
             }
             Item::Literal(literal) => {
-                write!(f, "{:?}", literal)?;
+                write!(f, "{:}", literal)?;
             }
         }
         Ok(())
