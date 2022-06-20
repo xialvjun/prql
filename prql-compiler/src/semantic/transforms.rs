@@ -8,17 +8,17 @@ use crate::error::{Error, Reason};
 use super::frame::extract_sorts;
 use super::Context;
 
-pub fn construct_transforms(nodes: Vec<Node>, context: &Context) -> Result<Vec<Node>> {
+pub fn construct_transforms(nodes: Vec<Node>, context: Context) -> Result<(Vec<Node>, Context)> {
     let mut resolver = TransformConstructor::new(context);
 
     let nodes = resolver.fold_nodes(nodes)?;
 
-    Ok(nodes)
+    Ok((nodes, resolver.context))
 }
 
 /// Can fold (walk) over AST and replaces some [FuncCall]s with [Transform]s
-pub struct TransformConstructor<'a> {
-    context: &'a Context,
+pub struct TransformConstructor {
+    context: Context,
 
     within_group: Vec<usize>,
 
@@ -29,8 +29,8 @@ pub struct TransformConstructor<'a> {
     sorted: Vec<ColumnSort<usize>>,
 }
 
-impl<'a> TransformConstructor<'a> {
-    fn new(context: &'a Context) -> Self {
+impl TransformConstructor {
+    fn new(context: Context) -> Self {
         TransformConstructor {
             context,
             within_group: vec![],
@@ -41,7 +41,7 @@ impl<'a> TransformConstructor<'a> {
     }
 }
 
-impl<'a> AstFold for TransformConstructor<'a> {
+impl AstFold for TransformConstructor {
     fn fold_node(&mut self, mut node: Node) -> Result<Node> {
         match node.item {
             Item::FuncCall(func_call) => {
@@ -51,7 +51,7 @@ impl<'a> AstFold for TransformConstructor<'a> {
                     let func_def = self.context.declarations.get_func(node.declared_at)?;
                     let return_type = func_def.return_ty.clone();
 
-                    let func_call = Item::FuncCall(func_call);
+                    let func_call = Item::FuncCall(self.fold_func_call(func_call)?);
 
                     // wrap into windowed
                     if Some(Ty::column()) <= return_type && !self.within_aggregate {
@@ -142,7 +142,7 @@ impl<'a> AstFold for TransformConstructor<'a> {
     }
 }
 
-impl<'a> TransformConstructor<'a> {
+impl TransformConstructor {
     fn wrap_into_windowed(&self, expr: Item, declared_at: Option<usize>) -> Item {
         const REF: &str = "<ref>";
 
@@ -490,14 +490,13 @@ fn unpack<const P: usize, const N: usize>(
 mod tests {
     use insta::assert_yaml_snapshot;
 
-    use crate::semantic::resolve_names;
     use crate::sql::load_std_lib;
-    use crate::{parse, resolve};
+    use crate::{analyze, parse};
 
     #[test]
     fn test_aggregate_positional_arg() {
         let stdlib = load_std_lib().unwrap();
-        let (_, context) = resolve(stdlib, None).unwrap();
+        let (_, context) = analyze(stdlib, None).unwrap();
         let context = Some(context);
 
         // distinct query #292
@@ -511,7 +510,7 @@ mod tests {
         ",
         )
         .unwrap();
-        let (result, _) = resolve(query.nodes, context.clone()).unwrap();
+        let (result, _) = analyze(query.nodes, context.clone()).unwrap();
         assert_yaml_snapshot!(result, @r###"
         ---
         - Pipeline:
@@ -580,7 +579,7 @@ mod tests {
         ",
         )
         .unwrap();
-        let result = resolve(query.nodes, context.clone());
+        let result = analyze(query.nodes, context.clone());
         assert!(result.is_err());
 
         // oops, two arguments
@@ -591,7 +590,7 @@ mod tests {
         ",
         )
         .unwrap();
-        let result = resolve(query.nodes, context.clone());
+        let result = analyze(query.nodes, context.clone());
         assert!(result.is_err());
 
         // correct function call
@@ -604,7 +603,7 @@ mod tests {
         ",
         )
         .unwrap();
-        let (result, _) = resolve(query.nodes, context).unwrap();
+        let (result, _) = analyze(query.nodes, context).unwrap();
         assert_yaml_snapshot!(result, @r###"
         ---
         - Pipeline:
@@ -657,7 +656,7 @@ mod tests {
     #[test]
     fn test_transform_sort() {
         let stdlib = load_std_lib().unwrap();
-        let (_, context) = resolve_names(stdlib, None).unwrap();
+        let (_, context) = analyze(stdlib, None).unwrap();
         let context = Some(context);
 
         let query = parse(
@@ -672,7 +671,7 @@ mod tests {
         )
         .unwrap();
 
-        let (result, _) = resolve_names(query.nodes, context).unwrap();
+        let (result, _) = analyze(query.nodes, context).unwrap();
         assert_yaml_snapshot!(result, @r###"
         ---
         - Pipeline:

@@ -369,7 +369,7 @@ mod tests {
     use insta::assert_snapshot;
     use serde_yaml::from_str;
 
-    use crate::{parse, resolve, resolve_and_translate};
+    use crate::{parse, analyze, resolve_and_translate};
 
     use super::*;
 
@@ -474,7 +474,7 @@ mod tests {
         join salaries [emp_no]
         select [first_name, salaries.salary]
         "#;
-        let result = parse(prql).and_then(|x| resolve(x.nodes, None));
+        let result = parse(prql).and_then(|x| analyze(x.nodes, None));
         result.unwrap();
 
         let prql = r#"
@@ -483,7 +483,7 @@ mod tests {
         join salaries [emp_no]
         select [first_name, salaries.salary]
         "#;
-        let result = parse(prql).and_then(|x| resolve(x.nodes, None));
+        let result = parse(prql).and_then(|x| analyze(x.nodes, None));
         assert!(result.is_err());
     }
 

@@ -323,7 +323,7 @@ impl std::fmt::Debug for MaterializationContext {
 mod test {
 
     use super::*;
-    use crate::{parse, resolve, utils::diff};
+    use crate::{parse, analyze, utils::diff};
     use insta::{assert_display_snapshot, assert_snapshot, assert_yaml_snapshot};
     use serde_yaml::to_string;
 
@@ -332,7 +332,7 @@ mod test {
     }
 
     fn resolve_and_materialize(query: Query) -> Result<Vec<Node>> {
-        let (res, context) = resolve(query.nodes, None)?;
+        let (res, context) = analyze(query.nodes, None)?;
 
         let pipeline = find_pipeline(res);
 
@@ -351,7 +351,7 @@ mod test {
     "#,
         )?;
 
-        let (res, context) = resolve(query.nodes, None)?;
+        let (res, context) = analyze(query.nodes, None)?;
 
         let pipeline = find_pipeline(res);
 
@@ -471,7 +471,7 @@ take 20
                   named_args: {}
         "###);
 
-        let (res, context) = resolve(query.nodes, None)?;
+        let (res, context) = analyze(query.nodes, None)?;
 
         let pipeline = find_pipeline(res);
 
@@ -559,7 +559,7 @@ take 20
         "#,
         )?;
 
-        let (res, context) = resolve(query.nodes, None)?;
+        let (res, context) = analyze(query.nodes, None)?;
 
         let pipeline = find_pipeline(res);
 
@@ -904,8 +904,8 @@ take 20
         "#,
         )?;
 
-        let (res1, context) = resolve(query1.nodes, None)?;
-        let (res2, context) = resolve(query2.nodes, Some(context))?;
+        let (res1, context) = analyze(query1.nodes, None)?;
+        let (res2, context) = analyze(query2.nodes, Some(context))?;
 
         let (mat, frame, context) = materialize(find_pipeline(res1), context.into(), None)?;
 
