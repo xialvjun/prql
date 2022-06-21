@@ -67,12 +67,12 @@ select url = f&#34;http://www.{domain}.{tld}/{page}&#34;
 </code></pre><pre><code class="language-sql hljs" data-lang=sql>SELECT CONCAT(&#39;http://www.&#39;, domain, &#39;.&#39;, tld,
   &#39;/&#39;, page) AS url
 FROM web
-</code></pre></div><div class="tab-pane fade row" id=v-pills-functions role=tabpanel aria-labelledby=v-pills-functions-tab tabindex=0><pre><code class="language-prql hljs" data-lang=prql>func fahrenheit_of_celsius temp -&gt; temp * 3 &#43; 32
+</code></pre></div><div class="tab-pane fade row" id=v-pills-functions role=tabpanel aria-labelledby=v-pills-functions-tab tabindex=0><pre><code class="language-prql hljs" data-lang=prql>func fahrenheit_from_celsius temp -&gt; temp * 9/5 &#43; 32
 
 from weather
-select temp_f = (fahrenheit_of_celsius temp_c)
+select temp_f = (fahrenheit_from_celsius temp_c)
 </code></pre><pre><code class="language-sql hljs" data-lang=sql>SELECT
-  temp_c * 3 &#43; 32 AS temp_f
+  temp_c * 9/5 &#43; 32 AS temp_f
 FROM
   weather
 </code></pre></div></div></div></div></div></section><section class="content-section cards-section"><div class=container><div class="row content"><div class=section-title><h2 class=mb-3>Integrations</h2></div><div class="col-sm-6 col-md-3 d-flex align-items-stretch"><div class="card mb-3"><a href=https://github.com/prql/dbt-prql target=_blank><h4>dbt <sup><i class="bx bx-link-external"></i></sup></h4></a>Allows writing PRQL in dbt models.
