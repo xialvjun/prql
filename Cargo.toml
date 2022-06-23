@@ -6,6 +6,7 @@ members = [
   "prql-js",
   "book",
   "book/mdbook-prql", # Should this be here or should we exclude?
+  "test-databases",
 ]
 
 [profile.release.package.prql-js]

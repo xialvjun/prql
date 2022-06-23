@@ -1,0 +1,8 @@
+version: '3'
+services:
+  postgres:
+    build: 
+      dockerfile: postgres.dockerfile
+      context: .
+    ports:
+    - 5432:5432

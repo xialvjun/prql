@@ -1,0 +1,106 @@
+---
+source: test-databases/src/main.rs
+expression: postgres(&sql)
+input_file: test-databases/src/queries/a.prql
+---
+album_id	title	artist_id
+1	For Those About To Rock We Salute You	1
+2	Balls to the Wall	2
+3	Restless and Wild	2
+4	Let There Be Rock	1
+5	Big Ones	3
+6	Jagged Little Pill	4
+7	Facelift	5
+8	Warner 25 Anos	6
+9	Plays Metallica By Four Cellos	7
+10	Audioslave	8
+11	Out Of Exile	8
+12	BackBeat Soundtrack	9
+13	The Best Of Billy Cobham	10
+14	Alcohol Fueled Brewtality Live! [Disc 1]	11
+15	Alcohol Fueled Brewtality Live! [Disc 2]	11
+16	Black Sabbath	12
+17	Black Sabbath Vol. 4 (Remaster)	12
+18	Body Count	13
+19	Chemical Wedding	14
+20	The Best Of Buddy Guy - The Millenium Collection	15
+21	Prenda Minha	16
+22	Sozinho Remix Ao Vivo	16
+23	Minha Historia	17
+24	Afrociberdelia	18
+25	Da Lama Ao Caos	18
+26	Acústico MTV [Live]	19
+27	Cidade Negra - Hits	19
+28	Na Pista	20
+29	Axé Bahia 2001	21
+30	BBC Sessions [Disc 1] [Live]	22
+31	Bongo Fury	23
+32	Carnaval 2001	21
+33	Chill: Brazil (Disc 1)	24
+34	Chill: Brazil (Disc 2)	6
+35	Garage Inc. (Disc 1)	50
+36	Greatest Hits II	51
+37	Greatest Kiss	52
+38	Heart of the Night	53
+39	International Superhits	54
+40	Into The Light	55
+41	Meus Momentos	56
+42	Minha História	57
+43	MK III The Final Concerts [Disc 1]	58
+44	Physical Graffiti [Disc 1]	22
+45	Sambas De Enredo 2001	21
+46	Supernatural	59
+47	The Best of Ed Motta	37
+48	The Essential Miles Davis [Disc 1]	68
+49	The Essential Miles Davis [Disc 2]	68
+50	The Final Concerts (Disc 2)	58
+51	Up An' Atom	69
+52	Vinícius De Moraes - Sem Limite	70
+53	Vozes do MPB	21
+54	Chronicle, Vol. 1	76
+55	Chronicle, Vol. 2	76
+56	Cássia Eller - Coleção Sem Limite [Disc 2]	77
+57	Cássia Eller - Sem Limite [Disc 1]	77
+58	Come Taste The Band	58
+59	Deep Purple In Rock	58
+60	Fireball	58
+61	Knocking at Your Back Door: The Best Of Deep Purple in the 80's	58
+62	Machine Head	58
+63	Purpendicular	58
+64	Slaves And Masters	58
+65	Stormbringer	58
+66	The Battle Rages On	58
+67	Vault: Def Leppard's Greatest Hits	78
+68	Outbreak	79
+69	Djavan Ao Vivo - Vol. 02	80
+70	Djavan Ao Vivo - Vol. 1	80
+71	Elis Regina-Minha História	41
+72	The Cream Of Clapton	81
+73	Unplugged	81
+74	Album Of The Year	82
+75	Angel Dust	82
+76	King For A Day Fool For A Lifetime	82
+77	The Real Thing	82
+78	Deixa Entrar	83
+79	In Your Honor [Disc 1]	84
+80	In Your Honor [Disc 2]	84
+81	One By One	84
+82	The Colour And The Shape	84
+83	My Way: The Best Of Frank Sinatra [Disc 1]	85
+84	Roda De Funk	86
+85	As Canções de Eu Tu Eles	27
+86	Quanta Gente Veio Ver (Live)	27
+87	Quanta Gente Veio ver--Bônus De Carnaval	27
+88	Faceless	87
+89	American Idiot	54
+90	Appetite for Destruction	88
+91	Use Your Illusion I	88
+92	Use Your Illusion II	88
+93	Blue Moods	89
+94	A Matter of Life and Death	90
+95	A Real Dead One	90
+96	A Real Live One	90
+97	Brave New World	90
+98	Dance Of Death	90
+99	Fear Of The Dark	90
+100	Iron Maiden	90
