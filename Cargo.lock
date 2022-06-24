@@ -229,16 +229,16 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "3.1.18"
+version = "3.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d2dbdf4bdacb33466e854ce889eee8dfd5729abf7ccd7664d0a2d60cd384440b"
+checksum = "1df386a2d0f35bdefc0642fd8bcb2cd28243959f028abfd22fbade6f7d30980e"
 dependencies = [
  "atty",
  "bitflags",
  "clap_derive",
  "clap_lex",
  "indexmap",
- "lazy_static",
+ "once_cell",
  "strsim",
  "termcolor",
  "textwrap 0.15.0",
@@ -250,14 +250,14 @@ version = "3.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "da92e6facd8d73c22745a5d3cbb59bdf8e46e3235c923e516527d8e81eec14a4"
 dependencies = [
- "clap 3.1.18",
+ "clap 3.2.3",
 ]
 
 [[package]]
 name = "clap_derive"
-version = "3.1.18"
+version = "3.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "25320346e922cffe59c0bbc5410c8d8784509efb321488971081313cb1e1a33c"
+checksum = "7b740354ad9fcf20e27b46d921be4bb3712f5b3c2c7a89ba68a72a8e51d3a47f"
 dependencies = [
  "heck",
  "proc-macro-error",
@@ -268,9 +268,9 @@ dependencies = [
 
 [[package]]
 name = "clap_lex"
-version = "0.2.0"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a37c35f1112dad5e6e0b1adaff798507497a18fceeb30cceb3bae7d1427b9213"
+checksum = "5538cd660450ebeb4234cfecf8f2284b844ffc4c50531e66d584ad5b91293613"
 dependencies = [
  "os_str_bytes",
 ]
@@ -819,9 +819,9 @@ checksum = "05a0bd019339e5d968b37855180087b7b9d512c5046fbd244cf8c95687927d6e"
 
 [[package]]
 name = "insta"
-version = "1.14.1"
+version = "1.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bcc3e639bcba360d9237acabd22014c16f3df772db463b7446cd81b070714767"
+checksum = "4126dd76ebfe2561486a1bd6738a33d2029ffb068a99ac446b7f8c77b2e58dbc"
 dependencies = [
  "console",
  "globset",
@@ -958,7 +958,7 @@ checksum = "74612ae81a3e5ee509854049dfa4c7975ae033c06f5fc4735c7dfbe60ee2a39d"
 dependencies = [
  "anyhow",
  "chrono",
- "clap 3.1.18",
+ "clap 3.2.3",
  "clap_complete",
  "env_logger",
  "handlebars",
@@ -995,7 +995,7 @@ name = "mdbook-prql"
 version = "0.1.1"
 dependencies = [
  "anyhow",
- "clap 3.1.18",
+ "clap 3.2.3",
  "globset",
  "insta",
  "itertools",
@@ -1397,7 +1397,7 @@ dependencies = [
  "anyhow",
  "ariadne",
  "atty",
- "clap 3.1.18",
+ "clap 3.2.3",
  "clio",
  "color-eyre",
  "criterion",
