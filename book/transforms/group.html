@@ -198,8 +198,15 @@ LIMIT
 </div>
 <p>To find the employee who joined first in each department, it’s exactly the
 same pipeline, but within a <code>group</code> expression:</p>
-<pre><code class="language-admonish todo">This isn't yet implemented, ref &lt;https://github.com/prql/prql/issues/421&gt;
-</code></pre>
+<div id="admonition-todo" class="admonition info">
+<div class="admonition-title">
+<p>Todo</p>
+<p><a class="admonition-anchor-link" href="#admonition-todo"></a></p>
+</div>
+<div>
+<p>This isn’t yet implemented, ref <a href="https://github.com/prql/prql/issues/421">https://github.com/prql/prql/issues/421</a></p>
+</div>
+</div>
 <pre><code class="language-prql_no_test">from employees
 group role (
   sort join_date  # taken from above

@@ -1060,8 +1060,15 @@ LIMIT
 </div>
 <p>To find the employee who joined first in each department, it’s exactly the
 same pipeline, but within a <code>group</code> expression:</p>
-<pre><code class="language-admonish todo">This isn't yet implemented, ref &lt;https://github.com/prql/prql/issues/421&gt;
-</code></pre>
+<div id="admonition-todo" class="admonition info">
+<div class="admonition-title">
+<p>Todo</p>
+<p><a class="admonition-anchor-link" href="transforms/group.html#admonition-todo"></a></p>
+</div>
+<div>
+<p>This isn’t yet implemented, ref <a href="https://github.com/prql/prql/issues/421">https://github.com/prql/prql/issues/421</a></p>
+</div>
+</div>
 <pre><code class="language-prql_no_test">from employees
 group role (
   sort join_date  # taken from above
@@ -1464,11 +1471,18 @@ FROM
 <p>PRQL uses <code>@</code> followed by a string to represent dates &amp; times. This is less
 verbose than SQL’s approach of <code>TIMESTAMP '2004-10-19 10:23:54'</code> and more
 explicit than SQL’s implicit option of just using a string <code>'2004-10-19 10:23:54'</code>.</p>
-<pre><code class="language-admonish note">Currently PRQL passes strings which can be compiled straight through to the
+<div id="admonition-note" class="admonition note">
+<div class="admonition-title">
+<p>Note</p>
+<p><a class="admonition-anchor-link" href="language-features/dates_and_times.html#admonition-note"></a></p>
+</div>
+<div>
+<p>Currently PRQL passes strings which can be compiled straight through to the
 database, and so many compatible formats string may work, but we may refine this
-in the future to aid in compatibility across databases. We'll always support the
-canonical [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) format described below.
-</code></pre>
+in the future to aid in compatibility across databases. We’ll always support the
+canonical <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601</a> format described below.</p>
+</div>
+</div>
 <h2 id="dates"><a class="header" href="#dates">Dates</a></h2>
 <p>Dates are represented by <code>@{yyyy-mm-dd}</code> — a <code>@</code> followed by the
 date format.</p>
@@ -1532,12 +1546,19 @@ time.</p>
 <h2 id="intervals"><a class="header" href="#intervals">Intervals</a></h2>
 <p>Intervals are represented by <code>{N}{periods}</code>, such as <code>2years</code> or <code>10minutes</code>,
 without a space.</p>
-<pre><code class="language-admonish note">These aren't the same as ISO8601, because we evaluated `P3Y6M4DT12H30M5S` to
-be difficult to understand, but we could support a simplified form if there's
-demand for it. We don't currently support compound expressions, for example
-`2years10months`, but most DBs will allow `2years + 10months`. Please raise an
-issue if this is inconvenient.
-</code></pre>
+<div id="admonition-note-1" class="admonition note">
+<div class="admonition-title">
+<p>Note</p>
+<p><a class="admonition-anchor-link" href="language-features/dates_and_times.html#admonition-note-1"></a></p>
+</div>
+<div>
+<p>These aren’t the same as ISO8601, because we evaluated <code>P3Y6M4DT12H30M5S</code> to
+be difficult to understand, but we could support a simplified form if there’s
+demand for it. We don’t currently support compound expressions, for example
+<code>2years10months</code>, but most DBs will allow <code>2years + 10months</code>. Please raise an
+issue if this is inconvenient.</p>
+</div>
+</div>
 <div class="comparison">
 <div>
 <h4 id="prql-50"><a class="header" href="#prql-50">PRQL</a></h4>
@@ -1950,20 +1971,41 @@ use three-or-more quotes, and close with the same number.</p>
 </code></pre>
 </div>
 </div>
-<pre><code class="language-admonish note">Currently PRQL does not adjust escape characters.
-</code></pre>
-<pre><code class="language-admonish warning">Currently PRQL allows multiline strings with either a single character or
+<div id="admonition-note" class="admonition note">
+<div class="admonition-title">
+<p>Note</p>
+<p><a class="admonition-anchor-link" href="language-features/strings.html#admonition-note"></a></p>
+</div>
+<div>
+<p>Currently PRQL does not adjust escape characters.</p>
+</div>
+</div>
+<div id="admonition-warning" class="admonition warning">
+<div class="admonition-title">
+<p>Warning</p>
+<p><a class="admonition-anchor-link" href="language-features/strings.html#admonition-warning"></a></p>
+</div>
+<div>
+<p>Currently PRQL allows multiline strings with either a single character or
 multiple character quotes. This may change for strings using a single character
-quote in future versions.
-</code></pre>
+quote in future versions.</p>
+</div>
+</div>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="stdlib"><a class="header" href="#stdlib">Stdlib</a></h1>
 <p>The standard library is currently fairly limited, and we’re very to expanding
 it. If we find ourselves using <a href="./language-features/s-strings.html">s-strings</a> for
 something frequently, raise an issue and we’ll add it to the stdlib.</p>
-<pre><code class="language-admonish note">Currently the stdlib implementation doesn't support different DB implementations itself;
-those need to be built deeper into the compiler. We'll resolve this at some point. Until
-then, we'll only add functions here that are broadly supported by most DBs.
-</code></pre>
+<div id="admonition-note" class="admonition note">
+<div class="admonition-title">
+<p>Note</p>
+<p><a class="admonition-anchor-link" href="stdlib.html#admonition-note"></a></p>
+</div>
+<div>
+<p>Currently the stdlib implementation doesn’t support different DB implementations itself;
+those need to be built deeper into the compiler. We’ll resolve this at some point. Until
+then, we’ll only add functions here that are broadly supported by most DBs.</p>
+</div>
+</div>
 <p>Here’s the source of the current <a href="https://github.com/prql/prql/blob/main/prql-compiler/src/sql/stdlib.prql">PRQL
 stdlib</a>:</p>
 <pre><code class="language-prql_no_test"># Aggregate Functions
