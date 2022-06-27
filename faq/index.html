@@ -75,12 +75,12 @@ synthesizing this tradeoff — have a single <code>filter</code> rather than <c
 & <code>QUALIFY</code> brings both more power <em>and</em> more accessibility.</li></ul><p>In the same way that &ldquo;SQL was invented in the 1970s and therefore must be bad&rdquo;
 is questionable logic, &ldquo;<code>n</code> languages have tried and failed so therefore SQL
 cannot be improved.&rdquo; suffers a similar fallacy. SQL isn&rsquo;t bad because it&rsquo;s old.
-It&rsquo;s bad because — in some cases — it&rsquo;s bad.</p><h2 id=whats-going-on-with-this-weird-aggregate-syntax-whats-wrong-with-select--group-by>What&rsquo;s going on with this weird <code>aggregate</code> syntax? What&rsquo;s wrong with <code>SELECT</code> & <code>GROUP BY</code>?</h2><p>SQL uses <code>SELECT</code> for all of these:</p><ul><li><p>Selecting or computing columns, without changing the shape of the data:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sql data-lang=sql><span style=display:flex><span><span style=color:#66d9ef>SELECT</span> x <span style=color:#f92672>*</span> <span style=color:#ae81ff>2</span> <span style=color:#66d9ef>FROM</span> y <span style=color:#66d9ef>as</span> two_x
+It&rsquo;s bad because — in some cases — it&rsquo;s bad.</p><h2 id=whats-going-on-with-this-aggregate-function-whats-wrong-with-select--group-by>What&rsquo;s going on with this <code>aggregate</code> function? What&rsquo;s wrong with <code>SELECT</code> & <code>GROUP BY</code>?</h2><p>SQL uses <code>SELECT</code> for all of these:</p><ul><li><p>Selecting or computing columns, without changing the shape of the data:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sql data-lang=sql><span style=display:flex><span><span style=color:#66d9ef>SELECT</span> x <span style=color:#f92672>*</span> <span style=color:#ae81ff>2</span> <span style=color:#66d9ef>FROM</span> y <span style=color:#66d9ef>as</span> two_x
 </span></span></code></pre></div></li><li><p>Reducing a column into a single row, with a reduction function:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sql data-lang=sql><span style=display:flex><span><span style=color:#66d9ef>SELECT</span> <span style=color:#66d9ef>SUM</span>(x) <span style=color:#66d9ef>FROM</span> y
 </span></span></code></pre></div></li><li><p>Reducing a column into groups, with a reduction function and a <code>GROUP BY</code> function:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sql data-lang=sql><span style=display:flex><span><span style=color:#66d9ef>SELECT</span> <span style=color:#66d9ef>SUM</span>(x) <span style=color:#66d9ef>FROM</span> y <span style=color:#66d9ef>GROUP</span> <span style=color:#66d9ef>BY</span> z
 </span></span></code></pre></div></li></ul><p>These are not orthogonal — <code>SELECT</code> does lots of different things depending on
 the context. It&rsquo;s difficult for both people and machines to evaluate the shape
-of the output. It&rsquo;s easy to mix meanings and raise an error (<code>SELECT x, MIN(y) FROM z</code>).</p><p>PRQL clearly delineates two operations with two transforms:</p><ul><li><p><code>select</code> — picking & calculating columns.
+of the output. It&rsquo;s easy to mix meanings and raise an error (e.g. <code>SELECT x, MIN(y) FROM z</code>).</p><p>PRQL clearly delineates two operations with two transforms:</p><ul><li><p><code>select</code> — picking & calculating columns.
 These calculations always produce exactly one output row for every input row.</p><pre tabindex=0><code class=language-prql data-lang=prql>from employees
 select name = f&#34;{first_name} {last_name}&#34;
 </code></pre></li><li><p><code>aggregate</code> — reducing multiple rows to a single row, with a reduction
@@ -92,7 +92,16 @@ PRQL&rsquo;s orthogonality.</p><pre tabindex=0><code class=language-prql data-la
 group department (
   aggregate [total_salary = sum salary]
 )
-</code></pre><p>For more detail, check out the docs in the
+</code></pre><p>While you should be skeptical of new claims from new entrants, but
+<a href=https://twitter.com/hadleywickham target=_blank rel=noopener>Hadley
+Wickham<sup><i class="bx bx-link-external"></i></sup></a>
+, the developer of
+<a href=https://www.tidyverse.org/ target=_blank rel=noopener>Tidyverse<sup><i class="bx bx-link-external"></i></sup></a>
+<a href="https://news.ycombinator.com/item?id=30067406" target=_blank rel=noopener>commented<sup><i class="bx bx-link-external"></i></sup></a>
+in a discussion on
+PRQL:</p><blockquote><p>FWIW the separate <code>group_by()</code> is one of my greatest design regrets with dplyr
+— I wish I had made <code>by</code> a parameter of <code>summarise()</code>, <code>mutate()</code>, <code>filter()</code>
+etc.</p></blockquote><p>For more detail, check out the docs in the
 <a href=https://prql-lang.org/book target=_blank rel=noopener>PRQL Book<sup><i class="bx bx-link-external"></i></sup></a>
 .</p></article></main><footer id=footer><div class=container><div class=row><div class="col-md-6 py-3"><h3>Help the project</h3><ul><li>Send a link to PRQL to a couple of people whose opinion you respect.</li><li>Rewrite any of your own queries to PRQL to see if it makes sense.
 You can use the
