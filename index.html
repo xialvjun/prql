@@ -137,7 +137,7 @@ group role (
 </code></pre><pre><code class="language-sql hljs" data-lang=sql>WITH table_0 AS (
   SELECT
     employees.*,
-    ROW NUMBER() OVER (
+    ROW_NUMBER() OVER (
       PARTITION BY role
       ORDER BY
         join_date
