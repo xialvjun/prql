@@ -151,70 +151,51 @@ since it transpiles to SQL.</p>
 <div>
 <h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">from employees
-filter country_code == &quot;USA&quot;   # Each line transforms the previous result.
-derive [                       # This adds columns / variables.
-  gross_salary = salary + payroll_tax,
-  gross_cost = gross_salary + benefits_cost  # Variables can use other variables.
+filter start_date &gt; @2021-01-01               # Clear date syntax.
+derive [                                      # `derive` adds columns / variables.
+  gross_salary = salary + (tax ?? 0),         # Terse coalesce
+  gross_cost = gross_salary + benefits_cost,  # Variables can use other variables.
 ]
 filter gross_cost &gt; 0
-group [title, country_code] (  # For each group use a nested pipeline
-  aggregate [                  # Aggregate each group to a single row
-    average salary,
+group [title, country] (                      # `group` runs a pipeline over each group.
+  aggregate [                                 # `aggregate` reduces each group to a row.
     average gross_salary,
-    sum salary,
-    sum gross_salary,
-    average gross_cost,
-    sum_gross_cost = sum gross_cost,
-    ct = count,
+    sum_gross_cost = sum gross_cost,          # `=` sets a column name.
   ]
 )
-sort sum_gross_cost
-filter ct &gt; 200
-take 20
-join countries side:left [country_code]
+filter sum_gross_cost &gt; 100000                # Identical syntax for SQL's `WHERE` &amp; `HAVING`.
 derive [
-  always_true = true,
-  db_version = s&quot;version()&quot;,    # An S-string, which transpiles directly into SQL
+  id = f&quot;{title}_{country}&quot;,                   # F-strings like python.
+  db_version = s&quot;version()&quot;,                  # An S-string, which transpiles directly into SQL
 ]
+sort [sum_gross_cost, -country]               # `-country` means descending order.
+take 1..20                                    # Range expressions (also valid here as `take 20`).
 </code></pre>
 </div>
 <div>
 <h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">WITH table_0 AS (
-  SELECT
-    title,
-    country_code,
-    AVG(salary),
-    AVG(salary + payroll_tax),
-    SUM(salary),
-    SUM(salary + payroll_tax),
-    AVG(salary + payroll_tax + benefits_cost),
-    SUM(salary + payroll_tax + benefits_cost) AS sum_gross_cost,
-    COUNT(*) AS ct
-  FROM
-    employees
-  WHERE
-    country_code = 'USA'
-    AND salary + payroll_tax + benefits_cost &gt; 0
-  GROUP BY
-    title,
-    country_code
-  HAVING
-    COUNT(*) &gt; 200
-  ORDER BY
-    sum_gross_cost
-  LIMIT
-    20
-)
-SELECT
-  table_0.*,
-  countries.*,
-  country_code,
-  true AS always_true,
+<pre><code class="language-sql">SELECT
+  title,
+  country,
+  AVG(salary + COALESCE(tax, 0)),
+  SUM(salary + COALESCE(tax, 0) + benefits_cost) AS sum_gross_cost,
+  CONCAT(title, '_', country) AS id,
   version() AS db_version
 FROM
-  table_0
-  LEFT JOIN countries USING(country_code)
+  employees
+WHERE
+  start_date &gt; DATE '2021-01-01'
+  AND salary + COALESCE(tax, 0) + benefits_cost &gt; 0
+GROUP BY
+  title,
+  country
+HAVING
+  SUM(salary + COALESCE(tax, 0) + benefits_cost) &gt; 100000
+ORDER BY
+  sum_gross_cost,
+  country DESC
+LIMIT
+  20
 </code></pre>
 </div>
 </div>
