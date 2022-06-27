@@ -198,21 +198,38 @@ LIMIT
 </div>
 <p>To find the employee who joined first in each department, it’s exactly the
 same pipeline, but within a <code>group</code> expression:</p>
-<div id="admonition-todo" class="admonition info">
-<div class="admonition-title">
-<p>Todo</p>
-<p><a class="admonition-anchor-link" href="#admonition-todo"></a></p>
-</div>
+<div class="comparison">
 <div>
-<p>This isn’t yet implemented, ref <a href="https://github.com/prql/prql/issues/421">https://github.com/prql/prql/issues/421</a></p>
-</div>
-</div>
-<pre><code class="language-prql_no_test">from employees
+<h4 id="prql-2"><a class="header" href="#prql-2">PRQL</a></h4>
+<pre><code class="language-prql">from employees
 group role (
   sort join_date  # taken from above
   take 1
 )
 </code></pre>
+</div>
+<div>
+<h4 id="sql-2"><a class="header" href="#sql-2">SQL</a></h4>
+<pre><code class="language-sql">WITH table_0 AS (
+  SELECT
+    employees.*,
+    ROW NUMBER() OVER (
+      PARTITION BY role
+      ORDER BY
+        join_date
+    ) AS _rn
+  FROM
+    employees
+)
+SELECT
+  table_0.*
+FROM
+  table_0
+WHERE
+  _rn &lt;= 1
+</code></pre>
+</div>
+</div>
 
                     </main>
 

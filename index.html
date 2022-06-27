@@ -35,7 +35,9 @@ Null handling</button>
 <button class=nav-link id=v-pills-f-strings-tab data-bs-toggle=pill data-bs-target=#v-pills-f-strings type=button role=tab aria-controls=v-pills-f-strings aria-selected=false>
 F-strings</button>
 <button class=nav-link id=v-pills-functions-tab data-bs-toggle=pill data-bs-target=#v-pills-functions type=button role=tab aria-controls=v-pills-functions aria-selected=false>
-Functions</button></div><div class=tab-content id=v-pills-tabContent><div class="tab-pane fade
+Functions</button>
+<button class=nav-link id=v-pills-top-n-tab data-bs-toggle=pill data-bs-target=#v-pills-top-n type=button role=tab aria-controls=v-pills-top-n aria-selected=false>
+Top n items</button></div><div class=tab-content id=v-pills-tabContent><div class="tab-pane fade
 show active
 row" id=v-pills-basics role=tabpanel aria-labelledby=v-pills-basics-tab tabindex=0><pre><code class="language-prql hljs" data-lang=prql>from employees
 select [id, first_name, age]
@@ -81,6 +83,28 @@ select temp_f = (fahrenheit_from_celsius temp_c)
   temp_c * 9/5 &#43; 32 AS temp_f
 FROM
   weather
+</code></pre></div><div class="tab-pane fade row" id=v-pills-top-n role=tabpanel aria-labelledby=v-pills-top-n-tab tabindex=0><pre><code class="language-prql hljs" data-lang=prql>from employees
+group role (
+  sort join_date
+  take 1
+)
+</code></pre><pre><code class="language-sql hljs" data-lang=sql>WITH table_0 AS (
+  SELECT
+    employees.*,
+    ROW NUMBER() OVER (
+      PARTITION BY role
+      ORDER BY
+        join_date
+    ) AS _rn
+  FROM
+    employees
+)
+SELECT
+  table_0.*
+FROM
+  table_0
+WHERE
+  _rn &lt;= 1
 </code></pre></div></div></div></div></div></section><section class="content-section cards-section"><div class=container><div class="row content"><div class=section-title><h2>Integrations</h2></div><div class="row row-cols-1 row-cols-lg-4 justify-content-left"><div class="col g-3"><div class=card><h4><a href=https://github.com/prql/dbt-prql target=_blank rel=noopener>dbt<sup><i class="bx bx-link-external"></i></sup></a></h4>Allows writing PRQL in dbt models.
 This combines the benefits of PRQL&rsquo;s power & simplicity within queries; with dbt&rsquo;s version control, lineage & testing across queries.</div></div><div class="col g-3"><div class=card><h4><a href=https://pyprql.readthedocs.io/en/latest/magic_readme.html target=_blank rel=noopener>Jupyter/IPython<sup><i class="bx bx-link-external"></i></sup></a></h4>PyPrql has a magic extension, which executes a PRQL cell against a database.
 It can also set up an in-memory DuckDB instance, populated with a pandas DataFrame.</div></div><div class="col g-3"><div class=card><h4><a href="https://marketplace.visualstudio.com/items?itemName=prql.prql" target=_blank rel=noopener>Visual Studio Code<sup><i class="bx bx-link-external"></i></sup></a></h4>Extension with syntax highlighting and an upcoming language server.</div></div><div class="col g-3"><div class=card><h4 class=text-muted>Prefect</h4>Upcoming.</div></div></div></div></div></section><section class="content-section cards-section"><div class=container><div class="row content"><div class=section-title><h2>Tools</h2></div><div class="row row-cols-1 row-cols-lg-4 justify-content-left"><div class="col g-3"><div class=card><h4><a href=https://prql-lang.org/playground/ target=_blank rel=noopener>Playground<sup><i class="bx bx-link-external"></i></sup></a></h4>Online in-browser playground that compiles PRQL to SQL as you type.</div></div><div class="col g-3"><div class=card><h4><a href=https://github.com/prql/prql target=_blank rel=noopener>prql-compiler<sup><i class="bx bx-link-external"></i></sup></a></h4><p>Reference compiler implementation. Has a CLI utility that can transpile, format and annotate PRQL queries.</p><p><code>cargo install prql</code></p><p><code>brew install prql/prq/prql</code></p></div></div><div class="col g-3"><div class=card><h4><a href=https://github.com/prql/PyPrql target=_blank rel=noopener>PyPrql<sup><i class="bx bx-link-external"></i></sup></a></h4><p>Python TUI for connecting to databases.
