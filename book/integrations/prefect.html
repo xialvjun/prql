@@ -144,6 +144,7 @@
 <p>With a Postgres Task, replace:</p>
 <pre><code class="language-python">PostgresExecute.run(..., query=sql)
 </code></pre>
+<p>…with…</p>
 <pre><code class="language-python">PostgresExecute.run(..., query=pyprql.to_sql(prql))
 </code></pre>
 <p>We’re big fans of Prefect, and if there is anything that would make the
