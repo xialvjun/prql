@@ -32,6 +32,8 @@ Dates</button>
 Orthogonality</button>
 <button class=nav-link id=v-pills-f-strings-tab data-bs-toggle=pill data-bs-target=#v-pills-f-strings type=button role=tab aria-controls=v-pills-f-strings aria-selected=false>
 F-strings</button>
+<button class=nav-link id=v-pills-windows-tab data-bs-toggle=pill data-bs-target=#v-pills-windows type=button role=tab aria-controls=v-pills-windows aria-selected=false>
+Windows</button>
 <button class=nav-link id=v-pills-functions-tab data-bs-toggle=pill data-bs-target=#v-pills-functions type=button role=tab aria-controls=v-pills-functions aria-selected=false>
 Functions</button>
 <button class=nav-link id=v-pills-top-n-tab data-bs-toggle=pill data-bs-target=#v-pills-top-n type=button role=tab aria-controls=v-pills-top-n aria-selected=false>
@@ -97,6 +99,23 @@ select url = f&#34;http://www.{domain}.{tld}/{page}&#34;
 </code></pre><pre><code class="language-sql hljs" data-lang=sql>SELECT CONCAT(&#39;http://www.&#39;, domain, &#39;.&#39;, tld,
   &#39;/&#39;, page) AS url
 FROM web
+</code></pre></div><div class="tab-pane fade row" id=v-pills-windows role=tabpanel aria-labelledby=v-pills-windows-tab tabindex=0><pre><code class="language-prql hljs" data-lang=prql>from employees
+group employee_id (
+  sort month
+  window rolling:12 (
+    derive [trail_12_m_comp = sum paycheck]
+  )
+)
+</code></pre><pre><code class="language-sql hljs" data-lang=sql>SELECT
+  employees.*,
+  SUM(paycheck) OVER (
+    PARTITION BY employee_id
+    ORDER BY
+      month ROWS BETWEEN 11 PRECEDING
+      AND CURRENT ROW
+  ) AS trail_12_m_comp
+FROM
+  employees
 </code></pre></div><div class="tab-pane fade row" id=v-pills-functions role=tabpanel aria-labelledby=v-pills-functions-tab tabindex=0><pre><code class="language-prql hljs" data-lang=prql>func fahrenheit_from_celsius temp -&gt; temp * 9/5 &#43; 32
 
 from weather
