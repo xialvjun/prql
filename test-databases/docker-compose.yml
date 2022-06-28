@@ -1,7 +1,7 @@
-version: '3'
+version: "3"
 services:
   postgres:
-    build: 
+    build:
       dockerfile: postgres.dockerfile
       context: .
     healthcheck:
@@ -10,11 +10,11 @@ services:
       timeout: 10s
       retries: 120
     ports:
-    - 5432:5432
+      - 5432:5432
   test:
-    build: 
+    build:
       dockerfile: test.dockerfile
       context: .
-    depends_on: 
+    depends_on:
       postgres:
         condition: service_healthy
