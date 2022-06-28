@@ -55,6 +55,7 @@ mod tests {
             })
             .unwrap()
             .into_iter()
+            .take(100) // truncate to 100 rows
             .map(|r| r.unwrap())
             .collect::<Vec<String>>()
             .join("\n");
@@ -65,7 +66,8 @@ mod tests {
     fn postgres(sql: &str) -> String {
         use postgres::{Client, NoTls};
 
-        let mut client = Client::connect("host=localhost user=postgres", NoTls).unwrap();
+        let host = "localhost"; // change this to 'postgres' to run in docker compose
+        let mut client = Client::connect(&format!("host={} user=postgres", host), NoTls).unwrap();
 
         let statement = client.prepare(sql).unwrap();
 
@@ -73,7 +75,7 @@ mod tests {
             .columns()
             .iter()
             .map(|c| c.name())
-            .take(100)
+            .take(100) // truncate to 100 rows
             .collect::<Vec<_>>()
             .join("\t");
 
