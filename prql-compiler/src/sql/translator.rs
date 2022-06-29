@@ -141,7 +141,7 @@ fn table_factor_of_table_ref(table_ref: &TableRef) -> TableFactor {
             name: Item::Ident(a).try_into().unwrap(),
             columns: vec![],
         }),
-        args: vec![],
+        args: None,
         with_hints: vec![],
     }
 }
@@ -799,6 +799,49 @@ mod test {
         SELECT
           employees.*,
           true AS always_true
+        FROM
+          employees
+        "###
+        );
+    }
+
+    #[test]
+    fn test_stdlib() {
+        let query: Query = parse(
+            r###"
+        from employees
+        aggregate (
+          [salary_usd = min salary]
+        )
+        "###,
+        )
+        .unwrap();
+
+        let sql = resolve_and_translate(query).unwrap();
+        assert_snapshot!(sql,
+            @r###"
+        SELECT
+          MIN(salary) AS salary_usd
+        FROM
+          employees
+        "###
+        );
+
+        let query: Query = parse(
+            r###"
+        from employees
+        aggregate (
+          [salary_usd = (round salary 2)]
+        )
+        "###,
+        )
+        .unwrap();
+
+        let sql = resolve_and_translate(query).unwrap();
+        assert_snapshot!(sql,
+            @r###"
+        SELECT
+          ROUND(salary, 2) AS salary_usd
         FROM
           employees
         "###
@@ -2040,7 +2083,7 @@ take 20
         WITH table_0 AS (
           SELECT
             employees.*,
-            ROW NUMBER() OVER (PARTITION BY department) AS _rn
+            ROW_NUMBER() OVER (PARTITION BY department) AS _rn
           FROM
             employees
         )
@@ -2060,7 +2103,7 @@ take 20
         WITH table_0 AS (
           SELECT
             employees.*,
-            ROW NUMBER() OVER (
+            ROW_NUMBER() OVER (
               PARTITION BY department
               ORDER BY
                 salary

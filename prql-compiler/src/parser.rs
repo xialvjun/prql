@@ -444,6 +444,20 @@ mod test {
     #[test]
     fn test_parse_pipeline_parse_tree() {
         assert_debug_snapshot!(parse_tree_of_str(
+            // It's useful to have canonical examples rather than copy-pasting
+            // everything, so we reference the prql file here. But a downside of
+            // this implementation is: if there's an error in extracting the
+            // example from the docs into the file specified here, this test
+            // won't compile. Because `cargo insta test --accept` on the
+            // workspace — which extracts the example — requires compiling this,
+            // we can get stuck.
+            //
+            // Breaking out of that requires running this `cargo insta test
+            // --accept` within `book`, and then running it on the workspace.
+            // `task test-all` does this.
+            //
+            // If we change this, it would great if we can retain having
+            // examples tested in the docs.
             &include_str!("../../book/tests/prql/examples/variables-0.prql")
                 .trim()
                 // Required for Windows
@@ -1457,6 +1471,39 @@ select [
 \tdocstatus
 ]";
         parse(prql)?;
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_parse_backticks() -> Result<()> {
+        let prql = "
+from `a.b`
+aggregate [max c]
+";
+        assert_yaml_snapshot!(parse(prql)?, @r###"
+        ---
+        version: ~
+        dialect: Generic
+        nodes:
+          - Pipeline:
+              nodes:
+                - FuncCall:
+                    name: from
+                    args:
+                      - Ident: "`a.b`"
+                    named_args: {}
+                - FuncCall:
+                    name: aggregate
+                    args:
+                      - List:
+                          - FuncCall:
+                              name: max
+                              args:
+                                - Ident: c
+                              named_args: {}
+                    named_args: {}
+        "###);
 
         Ok(())
     }

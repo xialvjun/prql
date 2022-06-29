@@ -519,7 +519,7 @@ mod tests {
                   From:
                     name: c_invoice
                     alias: ~
-                    declared_at: 76
+                    declared_at: 79
                 ty:
                   Literal: Table
               - Transform:
@@ -612,9 +612,7 @@ mod tests {
                   From:
                     name: c_invoice
                     alias: ~
-                    declared_at: 76
-                ty:
-                  Literal: Table
+                    declared_at: 79
               - Transform:
                   Group:
                     by:
@@ -676,50 +674,95 @@ mod tests {
         ---
         - Pipeline:
             nodes:
-              - FuncCall:
-                  name: from
-                  args:
-                    - Ident: invoices
-                  named_args: {}
-              - FuncCall:
-                  name: sort
-                  args:
-                    - List:
-                        - Ident: issued_at
-                        - Unary:
-                            op: Neg
-                            expr:
-                              Ident: amount
-                        - Ident: num_of_articles
-                  named_args: {}
-              - FuncCall:
-                  name: sort
-                  args:
-                    - Ident: issued_at
-                  named_args: {}
-              - FuncCall:
-                  name: sort
-                  args:
-                    - Unary:
-                        op: Neg
-                        expr:
-                          Ident: issued_at
-                  named_args: {}
-              - FuncCall:
-                  name: sort
-                  args:
-                    - List:
-                        - Ident: issued_at
-                  named_args: {}
-              - FuncCall:
-                  name: sort
-                  args:
-                    - List:
-                        - Unary:
-                            op: Neg
-                            expr:
-                              Ident: issued_at
-                  named_args: {}
+              - Transform:
+                  From:
+                    name: invoices
+                    alias: ~
+                    declared_at: 79
+                ty:
+                  Literal: Table
+              - Transform:
+                  Sort:
+                    - direction: Asc
+                      column:
+                        Ident: issued_at
+                        ty:
+                          Literal: Column
+                    - direction: Desc
+                      column:
+                        Ident: amount
+                        ty:
+                          Literal: Column
+                    - direction: Asc
+                      column:
+                        Ident: num_of_articles
+                        ty:
+                          Literal: Column
+                ty:
+                  Function:
+                    named: {}
+                    args:
+                      - Infer
+                    return_ty:
+                      Literal: Table
+              - Transform:
+                  Sort:
+                    - direction: Asc
+                      column:
+                        Ident: issued_at
+                        ty:
+                          Literal: Column
+                ty:
+                  Function:
+                    named: {}
+                    args:
+                      - Infer
+                    return_ty:
+                      Literal: Table
+              - Transform:
+                  Sort:
+                    - direction: Desc
+                      column:
+                        Ident: issued_at
+                        ty:
+                          Literal: Column
+                ty:
+                  Function:
+                    named: {}
+                    args:
+                      - Infer
+                    return_ty:
+                      Literal: Table
+              - Transform:
+                  Sort:
+                    - direction: Asc
+                      column:
+                        Ident: issued_at
+                        ty:
+                          Literal: Column
+                ty:
+                  Function:
+                    named: {}
+                    args:
+                      - Infer
+                    return_ty:
+                      Literal: Table
+              - Transform:
+                  Sort:
+                    - direction: Desc
+                      column:
+                        Ident: issued_at
+                        ty:
+                          Literal: Column
+                ty:
+                  Function:
+                    named: {}
+                    args:
+                      - Infer
+                    return_ty:
+                      Literal: Table
+          ty:
+            Literal: Table
         "###);
     }
 }

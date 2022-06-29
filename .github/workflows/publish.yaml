@@ -5,6 +5,8 @@ on:
       - main
     tags:
       - "*"
+  # Called by pull-request when specifically requested
+  workflow_call:
 
 jobs:
   publish-gh-pages:
@@ -29,6 +31,11 @@ jobs:
       - name: 💰 Cache
         uses: Swatinem/rust-cache@v1
       - uses: peaceiris/actions-mdbook@v1
+      - uses: actions-rs/install@v0.1
+        with:
+          crate: mdbook-admonish
+          version: 1.7.0
+          use-tool-cache: true
       - name: 🔨 Build book
         run: mdbook build
         working-directory: book/
@@ -56,25 +63,3 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: website/public/
-
-  build-python-wheels:
-    uses: ./.github/workflows/python.yaml
-  publish-to-pypi:
-    name: Release
-    runs-on: ubuntu-latest
-    # Currently excluded since we need to use the PYPI_API_TOKEN
-    # if: "startsWith(github.ref, 'refs/tags/')"
-    if: "false"
-    needs: [build-python-wheels]
-    steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: wheels
-      - name: Publish to PyPI
-        uses: messense/maturin-action@v1
-        env:
-          # TODO: Upload PYPI_API_TOKEN, confirm how we release all crates together.
-          MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
-        with:
-          command: upload
-          args: --skip-existing *

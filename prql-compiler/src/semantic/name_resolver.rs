@@ -545,7 +545,7 @@ mod tests {
         WITH table_0 AS (
           SELECT
             employees.*,
-            ROW NUMBER() OVER (
+            ROW_NUMBER() OVER (
               PARTITION BY last_name
               ORDER BY
                 first_name

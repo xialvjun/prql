@@ -1,6 +1,5 @@
 ---
-title: "Motivation"
-url: motivation
+title: "Examples"
 ---
 
 ## A simple example
@@ -86,7 +85,6 @@ for code to construct or edit PRQL queries. In SQL, adding a filter to a query
 involves parsing the query to find and then modify the `WHERE` statement, or
 wrapping the existing query in a CTE. In PRQL, adding a filter just involves
 appending a `filter` transformation to the query.
-
 
 ## A more complex example
 

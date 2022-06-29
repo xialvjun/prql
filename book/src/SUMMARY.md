@@ -19,6 +19,7 @@
   - [Take](./transforms/take.md)
   - [Window](./transforms/window.md)
 - [Language features](./language-features/README.md)
+
   - [Coalesce](./language-features/coalesce.md)
     <!-- `DATE_TRUNC(foo_date, YEAR)` -> `foo_date.year`? Or -> `foo_date | as year`? Or `foo_date | to year`? -->
   - [Dates & Times](./language-features/dates_and_times.md)
@@ -31,12 +32,13 @@
   - [S-Strings](./language-features/s-strings.md)
   - [Strings](./language-features/strings.md)
 
-- [Stdlib]()
-- [Integrations]()
+- [Stdlib](./stdlib.md)
+- [Integrations](./integrations/README.md)
+
+  - [dbt](./integrations/dbt.md)
+  - [Jupyter](./integrations/jupyter.md)
+  - [Prefect](./integrations/prefect.md)
   - [VSCode]()
-  - [Jupyter]()
-  - [Prefect]()
-  - [dbt]()
   - [Rill]()
 
 - [Examples](./examples/README.md)

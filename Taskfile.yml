@@ -11,10 +11,13 @@
 version: "3"
 
 vars:
+  # Keeps in sync with .vscode/extensions.json
   vscode_extensions: |
+    budparr.language-hugo-vscode
+    esbenp.prettier-vscode
+    mitsuhiko.insta
     prql.prql
     rust-lang.rust-analyzer
-    mitsuhiko.insta
 
 tasks:
   install-dev-tools:
@@ -26,11 +29,12 @@ tasks:
     desc: Install tools for PRQL development.
     cmds:
       # `--locked` installs from the underlying lock files (which is not the default?!)
-      - cargo install --locked cargo-insta default-target mdbook mdbook-admonish mdbook-toc wasm-bindgen-cli wasm-pack
+      - cargo install --locked cargo-audit cargo-insta default-target mdbook mdbook-admonish mdbook-toc wasm-bindgen-cli wasm-pack
       - rustup target add wasm32-unknown-unknown
       - python3 -m pip install -U maturin
       - task: install-pre-commit
       - task: install-brew-dependencies
+      - task: install-npm-dependencies
       # We only suggest, rather than install; we don't want to intrude (maybe we're being too conservative?).
       - task: suggest-vscode-extensions
       - cmd: |
@@ -94,6 +98,16 @@ tasks:
     cmds:
       - brew install hugo npm
 
+  install-npm-dependencies:
+    cmds:
+      - npm install --location=global prettier prettier-plugin-go-template
+      - cmd:
+          echo "In order to get nice auto-formatting of web code in VSCode, VSCode
+          requires configuration to use the system-wide install of prettier. See
+          https://github.com/NiklasPor/prettier-plugin-go-template/issues/58#issuecomment-1085060511
+          for more info."
+        silent: true
+
   build-all:
     desc: Build everything. Running this isn't required when developing; it's for caching or as a reference.
     vars:
@@ -110,3 +124,19 @@ tasks:
       - mdbook build book/
       - cd playground && npm install && npm run build
       - cd website && hugo
+
+  test-all:
+    desc: Test everything, reseting snapshots. Running this isn't required when developing; it's for caching or as a reference.
+    vars:
+      default_target:
+        sh: default-target
+    cmds:
+      # We run this first for the reasons given in
+      # `parser::test_parse_pipeline_parse_tree`. Ideally we would a) retain
+      # examples in the documentation (inc. tested), b) not rely on falliable
+      # tests to extract them, which include compiling prql-compiler, c) not
+      # fail other compliation steps if they can't be extracted.
+      - cargo insta test --accept -- run_examples
+      # Only delete unreferenced snapshots on the default target — lots are excluded under wasm.
+      - cargo insta test --accept --delete-unreferenced-snapshots -- --workspace --target={{.default_target}}
+      - cargo insta test --accept -- --workspace --target=wasm32-unknown-unknown

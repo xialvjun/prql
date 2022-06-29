@@ -10,17 +10,17 @@ group department (
 )
 ```
 
-or without a linebreak:
+This also works without a linebreak:
 
 ```prql
 from employees
 select department
-group department (take 1) # Note below
+group department (take 1)
 ```
 
 ## Selecting from each group
 
-We are be able to [select a rows from each
+We are be able to [select a single row from each
 group](https://stackoverflow.com/questions/3800551/select-first-row-in-each-group-by-group)
 by combining `group` and `sort`:
 
