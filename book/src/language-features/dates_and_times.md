@@ -23,9 +23,8 @@ derive age_at_year_end = (@2022-12-31 - dob)
 
 ## Times
 
-Times are represented by `@{HH:mm:ss.SSS±Z}` with any parts not supplied being
-rounded to zero, including the timezone, which is represented by `+HH:mm`,
-`-HH:mm` or `Z`. This is consistent with the ISO8601 time format.
+Times are represented by `@{HH:mm:ss.SSS}` with any parts not supplied being
+rounded to zero.
 
 ```prql
 from orders
